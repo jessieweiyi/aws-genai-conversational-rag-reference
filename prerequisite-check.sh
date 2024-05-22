@@ -56,7 +56,7 @@ check() {
   return 0
 }
 
-check "pnpm" "pnpm --version" ">=8" \
+check "pnpm" "pnpm --version" ">=8 <9" \
   "Recommendation: Install PNPM 8.6+. See https://pnpm.io/installation"
 PNPM_PASS=$?
 

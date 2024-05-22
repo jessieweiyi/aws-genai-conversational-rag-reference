@@ -6,7 +6,7 @@
 
 |   Tool                |   Version   |    Recommendation            |
 | --------------------- | ----------- | ---------------------------- |
-| pnpm                  | >=8.x       | <https://pnpm.io/installation> |
+| pnpm                  | >=8 <9      | <https://pnpm.io/installation> |
 | NodeJS                | >=18        | Use Node Version Manager ([nvm](https://github.com/nvm-sh/nvm)) |
 | Python                | >=3.10,<4   | Use Python Version Manager ([pyenv](https://github.com/pyenv/pyenv)) |
 | Poetry                | >=1.5,<2    | <https://python-poetry.org/docs/> |
