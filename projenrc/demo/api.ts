@@ -31,12 +31,11 @@ export class Api {
     const commonTsConfig: TypescriptConfigOptions = {
       compilerOptions: {
         jsx: TypeScriptJsxMode.REACT_JSX,
-        lib: ['dom', 'ES2019'],
-        skipLibCheck: true,
-        module: 'CommonJS',
+        lib: ['ES2019', 'ES2020', 'DOM', 'DOM.Iterable'],
+        module: 'ES6',
+        target: 'ES6',
         moduleResolution: TypeScriptModuleResolution.NODE,
-        target: 'ES2019',
-      }
+      },
     }
 
     this.project = new TypeSafeApiProject({

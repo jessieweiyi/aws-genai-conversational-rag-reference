@@ -14,24 +14,24 @@ files = [
 
 [[package]]
 name = "annotated-types"
-version = "0.6.0"
+version = "0.7.0"
 description = "Reusable constraint types to use with typing.Annotated"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "annotated_types-0.6.0-py3-none-any.whl", hash = "sha256:0641064de18ba7a25dee8f96403ebc39113d0cb953a01429249d5c7564666a43"},
-    {file = "annotated_types-0.6.0.tar.gz", hash = "sha256:563339e807e53ffd9c267e99fc6d9ea23eb8443c08f112651963e24e22f84a5d"},
+    {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
+    {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
 ]
 
 [[package]]
 name = "aws-lambda-powertools"
-version = "2.37.0"
+version = "2.38.1"
 description = "Powertools for AWS Lambda (Python) is a developer toolkit to implement Serverless best practices and increase developer velocity."
 optional = false
 python-versions = "<4.0.0,>=3.8"
 files = [
-    {file = "aws_lambda_powertools-2.37.0-py3-none-any.whl", hash = "sha256:6845995d7b0debc5b85c6d97b4336d9c536ade723d45cdc5a081477e4daa65e2"},
-    {file = "aws_lambda_powertools-2.37.0.tar.gz", hash = "sha256:a49dacba249e6db860d59314e4620648c1691727cf43e465e8f0907f699dc5e8"},
+    {file = "aws_lambda_powertools-2.38.1-py3-none-any.whl", hash = "sha256:4235f517a8429a0e4dd2f76ac3f2d0a77b4a8061fd75ca9da013e7a1b4d17699"},
+    {file = "aws_lambda_powertools-2.38.1.tar.gz", hash = "sha256:3e25a51c0dc022b4ab733582ab4f39764831b31369a56424ac9f07139b5e96b3"},
 ]
 
 [package.dependencies]
@@ -51,13 +51,13 @@ validation = ["fastjsonschema (>=2.14.5,<3.0.0)"]
 
 [[package]]
 name = "aws-xray-sdk"
-version = "2.13.0"
+version = "2.13.1"
 description = "The AWS X-Ray SDK for Python (the SDK) enables Python developers to record and emit information from within their applications to the AWS X-Ray service."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "aws-xray-sdk-2.13.0.tar.gz", hash = "sha256:816186126917bc35ae4e6e2f304702a43d494ecef34a39e6330f5018bdecc9f5"},
-    {file = "aws_xray_sdk-2.13.0-py2.py3-none-any.whl", hash = "sha256:d18604a8688b4bed03ce4a858cc9acd72b71400e085bf7512fc31cf657ca85f9"},
+    {file = "aws-xray-sdk-2.13.1.tar.gz", hash = "sha256:911d634c23e0693f585c4cab08d43ab5177f872de416fdc8dd0fe3b170b52835"},
+    {file = "aws_xray_sdk-2.13.1-py2.py3-none-any.whl", hash = "sha256:3da9d3b3d63c62f7745b987d80a157a30f4a0cd1db7e340b8f40f4d6aab30e12"},
 ]
 
 [package.dependencies]
@@ -66,17 +66,17 @@ wrapt = "*"
 
 [[package]]
 name = "boto3"
-version = "1.34.105"
+version = "1.34.111"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.105-py3-none-any.whl", hash = "sha256:b633e8fbf7145bdb995ce68a27d096bb89fd393185b0e773418d81cd78db5a03"},
-    {file = "boto3-1.34.105.tar.gz", hash = "sha256:f2c11635be0de7b7c06eb606ece1add125e02d6ed521592294a0a21af09af135"},
+    {file = "boto3-1.34.111-py3-none-any.whl", hash = "sha256:d6a8e77db316c6e1d9a25f77c795ed1e0a8bc621f863ce26d04b2225d30f2dce"},
+    {file = "boto3-1.34.111.tar.gz", hash = "sha256:8f18d212b9199dbbd9d596dd5929685b583ac938c60cceeac2e045c0c5d10323"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.105,<1.35.0"
+botocore = ">=1.34.111,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -85,13 +85,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.105"
+version = "1.34.111"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.105-py3-none-any.whl", hash = "sha256:a459d060b541beecb50681e6e8a39313cca981e146a59ba7c5229d62f631a016"},
-    {file = "botocore-1.34.105.tar.gz", hash = "sha256:727d5d3e800ac8b705fca6e19b6fefa1e728a81d62a712df9bd32ed0117c740b"},
+    {file = "botocore-1.34.111-py3-none-any.whl", hash = "sha256:e10affb7f372d50da957260adf2753a3f153bf90abe6910e11f09d1e443b5515"},
+    {file = "botocore-1.34.111.tar.gz", hash = "sha256:0e0fb9b605c46393d5c7c69bd516b36058334bdc8f389e680c6efcf0727f25db"},
 ]
 
 [package.dependencies]

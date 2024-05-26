@@ -34,8 +34,6 @@ export const useApiClient = () => {
           url = input;
         }
         url = url.replace(runtimeConfig.apiUrl, '');
-        const _matchPath = matchPath;
-        console.log(_matchPath);
 
         let match = matchPath('/chat/:chatId/message', url);
         if (match) {

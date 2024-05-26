@@ -298,14 +298,17 @@ export class ChatEngineChain extends BaseChain implements ChatEngineChainInput {
       //   * you'll need to look into how you instantiate `this.qaChain`
       const stream = await this.qaChain.stream(inputs, combineDocsRunManager);
 
+      let chunkIndex = 1;
+
       for await (const chunk of stream) {
+        logger.debug(`Received streaming chunk ${chunkIndex++}`);
         streamedResult += chunk.text;
         this.streamCallback(chunk.text);
       }
 
       result = { text: streamedResult };
     } else {
-      result = await this.qaChain.call(inputs, runManager?.getChild('combine_documents'));
+      result = await this.qaChain.invoke(inputs, runManager?.getChild('combine_documents'));
     }
 
     const qaChainExecTime = $$CombineDocumentsExecutionTime();

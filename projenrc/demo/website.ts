@@ -68,10 +68,6 @@ export class Website {
       ],
       tsconfig: {
         compilerOptions: {
-          lib: ['dom', 'dom.iterable', 'ES2019', 'esnext'],
-          skipLibCheck: true,
-          target: 'ES2019',
-          module: 'CommonJS',
           moduleResolution: TypeScriptModuleResolution.NODE,
           jsx: TypeScriptJsxMode.REACT_JSX,
         },
@@ -80,6 +76,8 @@ export class Website {
         compilerOptions: {
           noUnusedLocals: false,
           noUnusedParameters: false,
+          moduleResolution: TypeScriptModuleResolution.NODE,
+          jsx: TypeScriptJsxMode.REACT_JSX,
         },
       },
       rewire: {},

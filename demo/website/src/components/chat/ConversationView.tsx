@@ -22,6 +22,8 @@ export const ConversationView = forwardRef((props: ConversationViewProps, ref: R
 
   const inprogressMessages = useInprogressMessages(chatId, refetch);
 
+  console.log('ConversationView-inprogressMessages', inprogressMessages);
+
   useOnStreamLLMResponse((input) => {
     console.log('onStreamLLMResponse', input);
   }, []);

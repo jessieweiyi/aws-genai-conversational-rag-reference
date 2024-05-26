@@ -25,7 +25,10 @@ export const handler = listChatMessagesHandler(...interceptors, async ({ input, 
   const pageSize = input.requestParameters?.pageSize ?? 20;
   const ascending = input.requestParameters?.ascending ?? false;
 
-  const nextToken = input.requestParameters.nextToken ? parseNextToken(input.requestParameters.nextToken) : undefined;
+  const nextToken =
+    input.requestParameters?.nextToken && input.requestParameters?.nextToken !== 'null'
+      ? parseNextToken(input.requestParameters.nextToken)
+      : undefined;
 
   const queryResults = await listChatMessagesByTime(
     documentClient,

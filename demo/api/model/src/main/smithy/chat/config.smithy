@@ -18,6 +18,7 @@ structure ChatEngineLLMConfig {
     model: Any
     modelKwargs: Any
     endpointKwargs: Any
+    useStreaming: Boolean
 }
 
 // Chain config for chat engine

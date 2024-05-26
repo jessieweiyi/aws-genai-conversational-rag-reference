@@ -135,7 +135,7 @@ export class ChatEngine {
       classifyChain,
       returnSourceDocuments: true,
       engineCallbacks,
-      useStreaming,
+      useStreaming: this.useStreaming,
     }) as ChatEngineChain;
 
     if (!(this.chain instanceof ChatEngineChain)) {

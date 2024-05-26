@@ -7,7 +7,7 @@ import Cards from '@cloudscape-design/components/cards';
 import Header from '@cloudscape-design/components/header';
 import Pagination from '@cloudscape-design/components/pagination';
 import TextFilter from '@cloudscape-design/components/text-filter';
-import { Chat } from 'api-typescript-react-query-hooks/lib/models/Chat';
+import { Chat } from 'api-typescript-react-query-hooks';
 import { useCreateChatMutation } from '../../hooks/chats';
 import EmptyState from '../Empty';
 import { getMatchesCountText } from '../table-config';

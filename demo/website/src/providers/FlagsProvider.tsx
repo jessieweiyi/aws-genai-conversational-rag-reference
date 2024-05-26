@@ -1,10 +1,13 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
-import { FC, createContext, useContext, useMemo } from 'react';
+import { FC, createContext, useContext, useMemo, useState } from 'react';
 import { useRuntimeConfig } from '../Auth';
 
-export interface IFeatureFlags {}
-
+export const SEARCH_PARAM_FEATURES = 'features';
+export const FEATURE_FLAG_STREAMING = 'streaming';
+export interface IFeatureFlags {
+  [FEATURE_FLAG_STREAMING]?: boolean;
+}
 export const FlagContext = createContext<IFeatureFlags>({});
 
 export const useFeatureFlags = () => {
@@ -23,9 +26,28 @@ export const useFeatureFlag = (flag: keyof IFeatureFlags): boolean => {
 export const FlagsProvider: FC<React.PropsWithChildren> = ({ children }) => {
   const { flags } = useRuntimeConfig();
 
+  const [flagsOverride] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const featureParam = urlParams.get(SEARCH_PARAM_FEATURES);
+    return (
+      (featureParam &&
+        featureParam.split(',').reduce(
+          (aggr, f) => ({
+            ...aggr,
+            [f]: true,
+          }),
+          {},
+        )) ||
+      {}
+    );
+  });
+
   const value = useMemo<IFeatureFlags>(() => {
-    return flags || {};
-  }, [flags]);
+    return {
+      ...flags,
+      ...flagsOverride,
+    };
+  }, [flags, flagsOverride]);
 
   return <FlagContext.Provider value={value}>{children}</FlagContext.Provider>;
 };
