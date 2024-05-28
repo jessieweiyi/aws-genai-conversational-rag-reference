@@ -21,6 +21,7 @@ export enum ChainOperation {
   DOCUMENT_RETRIEVE = 'DOCUMENT_RETRIEVE',
   QA = 'QA',
 }
+
 export interface ChainOperationPayload {
   readonly message: string;
   readonly executionTime?: number;

@@ -81,7 +81,6 @@ export class ChatEngine {
       retriever,
       verbose,
       returnTraceData,
-
       engineCallbacks,
       useStreaming,
     });
@@ -110,7 +109,6 @@ export class ChatEngine {
       classifyChain,
       verbose,
       returnTraceData,
-
       engineCallbacks,
       useStreaming,
     } = props;

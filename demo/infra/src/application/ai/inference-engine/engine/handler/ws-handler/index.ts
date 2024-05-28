@@ -63,7 +63,6 @@ export const sendChatMessage: SendChatMessageChainedHandlerFunction = async (req
 
   const result = await createMessage({
     logger,
-
     userId,
     idToken,
     isAdmin: _isAdmin,

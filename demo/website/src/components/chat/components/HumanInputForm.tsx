@@ -1,6 +1,5 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
-import { ModelFramework } from '@aws/galileo-sdk/lib/models/types';
 import { Badge } from '@cloudscape-design/components';
 import Button from '@cloudscape-design/components/button';
 import SpaceBetween from '@cloudscape-design/components/space-between';
@@ -9,16 +8,12 @@ import { nanoid } from 'nanoid';
 import { useCallback, useEffect, useState } from 'react';
 import { useDefaultApiWebSocketClient, useOnUpdateInferenceStatus } from 'ws-api-typescript-websocket-hooks';
 import { useCreateChatMessageMutation, useUseStreaming } from '../../../hooks';
-import { useFoundationModelInventory } from '../../../hooks/llm-inventory';
 import { useChatEngineConfig } from '../../../providers/ChatEngineConfig';
-import { useFeatureFlag, FEATURE_FLAG_STREAMING } from '../../../providers/FlagsProvider';
 
 export default function HumanInputForm(props: { chat: Chat; onSuccess?: () => void }) {
   const [options] = useChatEngineConfig();
   const [currentHumanMessage, setCurrentHumanMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const inventory = useFoundationModelInventory();
-  const featureToggleOnStreaming = useFeatureFlag(FEATURE_FLAG_STREAMING);
 
   const onSuccess = useCallback(() => {
     props.onSuccess && props.onSuccess();
@@ -28,19 +23,8 @@ export default function HumanInputForm(props: { chat: Chat; onSuccess?: () => vo
   const createChatMessage = useCreateChatMessageMutation(props.chat.chatId, onSuccess);
   const wsClient = useDefaultApiWebSocketClient();
 
-  const isBedrockFramework =
-    options.llm?.model?.uuid &&
-    inventory?.models &&
-    inventory.models[options.llm.model.uuid]?.framework.type === ModelFramework.BEDROCK;
-
-  const isStreamingResponse =
-    featureToggleOnStreaming &&
-    isBedrockFramework &&
-    useStreaming &&
-    (typeof options.llm?.useStreaming === 'undefined' || options.llm?.useStreaming);
-
   useEffect(() => {
-    if (!isStreamingResponse) {
+    if (!useStreaming) {
       setIsLoading(createChatMessage.isLoading);
     }
   }, [useStreaming, createChatMessage.isLoading]);
@@ -58,7 +42,7 @@ export default function HumanInputForm(props: { chat: Chat; onSuccess?: () => vo
   }, []);
 
   async function sendMessage() {
-    if (isStreamingResponse) {
+    if (useStreaming) {
       setIsLoading(true);
       await wsClient.sendChatMessage({
         chatId: props.chat.chatId,

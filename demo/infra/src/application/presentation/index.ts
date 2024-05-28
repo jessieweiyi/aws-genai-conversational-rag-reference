@@ -294,8 +294,6 @@ export class PresentationStack extends NestedStack {
         }),
       ],
     });
-    // policy.attachToRole(props.authenticatedUserRole);
-    // props.authenticatedUserRole.attachInlinePolicy(policy);
 
     NagSuppressions.addResourceSuppressions(
       policy,
