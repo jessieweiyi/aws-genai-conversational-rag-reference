@@ -3,6 +3,7 @@ PDX-License-Identifier: Apache-2.0 */
 import '../langchain/patch.js';
 import { BaseRetriever } from '@langchain/core/retrievers';
 import { BaseLanguageModel } from 'langchain/base_language';
+import { ChatEngineCallbacks } from './callback.js';
 import { ChatEngineChain, ChatEngineChainFromInput } from './chain.js';
 import { ChatEngineConfig, resolveChatEngineConfig } from './config/index.js';
 import { DynamoDBChatMessageHistory } from './dynamodb/message-history.js';
@@ -19,6 +20,8 @@ export interface ChatEngineFromOption extends Omit<ChatEngineConfig, 'search'> {
   readonly search: SearchRetrieverInput;
   readonly verbose?: boolean;
   readonly returnTraceData?: boolean;
+  readonly engineCallbacks?: ChatEngineCallbacks;
+  readonly useStreaming?: boolean;
 }
 
 interface ChatEngineProps extends ChatEngineChainFromInput {
@@ -41,6 +44,8 @@ export class ChatEngine {
       verbose = process.env.LOG_LEVEL === 'DEBUG',
       returnTraceData,
       search,
+      engineCallbacks,
+      useStreaming,
       ...unresolvedConfig
     } = options;
 
@@ -76,6 +81,8 @@ export class ChatEngine {
       retriever,
       verbose,
       returnTraceData,
+      engineCallbacks,
+      useStreaming,
     });
   }
 
@@ -85,6 +92,8 @@ export class ChatEngine {
   readonly memory: ChatEngineHistory;
   readonly retriever: BaseRetriever;
   readonly chain: ChatEngineChain;
+  readonly engineCallbacks?: ChatEngineCallbacks;
+  readonly useStreaming: boolean;
 
   protected readonly returnTraceData: boolean;
 
@@ -100,6 +109,8 @@ export class ChatEngine {
       classifyChain,
       verbose,
       returnTraceData,
+      engineCallbacks,
+      useStreaming,
     } = props;
 
     this.returnTraceData = returnTraceData ?? false;
@@ -110,6 +121,9 @@ export class ChatEngine {
     this.memory = memory;
     this.retriever = retriever;
 
+    this.engineCallbacks = engineCallbacks;
+    this.useStreaming = useStreaming ?? false;
+
     this.chain = ChatEngineChain.from({
       verbose,
       memory,
@@ -118,6 +132,8 @@ export class ChatEngine {
       condenseQuestionChain,
       classifyChain,
       returnSourceDocuments: true,
+      engineCallbacks,
+      useStreaming: this.useStreaming,
     }) as ChatEngineChain;
 
     if (!(this.chain instanceof ChatEngineChain)) {

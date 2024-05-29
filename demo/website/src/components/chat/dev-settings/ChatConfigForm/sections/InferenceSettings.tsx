@@ -4,6 +4,7 @@ import { ModelFramework, ISageMakerEndpointModelFramework } from '@aws/galileo-s
 import { Icon } from '@cloudscape-design/components';
 import FormField from '@cloudscape-design/components/form-field';
 import SpaceBetween from '@cloudscape-design/components/space-between';
+import Toggle from '@cloudscape-design/components/toggle';
 import produce from 'immer';
 import { isEmpty } from 'lodash';
 import { FC, useCallback } from 'react';
@@ -11,6 +12,7 @@ import { Updater } from 'use-immer';
 import { useIsAdmin } from '../../../../../Auth';
 import { useFoundationModelInventory } from '../../../../../hooks/llm-inventory';
 import { useChatEngineConfigState } from '../../../../../providers/ChatEngineConfig';
+import { useFeatureFlag, FEATURE_FLAG_STREAMING } from '../../../../../providers/FlagsProvider';
 import CodeEditor from '../../../../code-editor';
 import { toCodeEditorJson } from '../../utils';
 import { CustomModelEditor, ICustomModel } from '../components/CustomModelEditor';
@@ -20,6 +22,7 @@ export const InferenceSettings: FC = () => {
   const isAdmin = useIsAdmin();
   const inventory = useFoundationModelInventory();
   const [llm, setLlm] = useChatEngineConfigState('llm');
+  const featureToggleOnStreaming = useFeatureFlag(FEATURE_FLAG_STREAMING);
 
   // Only allow custom models for admins
   const isCustomLlmModel = isAdmin && (llm?.model as ICustomModel)?.isCustom === true;
@@ -82,6 +85,11 @@ export const InferenceSettings: FC = () => {
     [setLlm],
   );
 
+  const isBedrockFramework =
+    llm?.model?.uuid &&
+    inventory?.models &&
+    inventory.models[llm.model.uuid]?.framework.type === ModelFramework.BEDROCK;
+
   return (
     <SpaceBetween direction="vertical" size="s">
       <FormField
@@ -101,6 +109,23 @@ export const InferenceSettings: FC = () => {
         />
       </FormField>
       {isCustomLlmModel && <CustomModelEditor value={llm?.modelKwargs} updateValue={updateCustomModel} />}
+      {featureToggleOnStreaming && isBedrockFramework && (
+        <FormField label="Response Streaming" stretch>
+          <Toggle
+            checked={typeof llm?.useStreaming === 'undefined' ? true : llm?.useStreaming}
+            onChange={({ detail }) => {
+              setLlm((draft) => {
+                return {
+                  ...draft,
+                  useStreaming: detail.checked,
+                };
+              });
+            }}
+          >
+            Stream Response
+          </Toggle>
+        </FormField>
+      )}
       <FormField label="Model Kwargs" stretch>
         <CodeEditor
           language="json"

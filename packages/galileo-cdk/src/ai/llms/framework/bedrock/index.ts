@@ -59,6 +59,9 @@ export interface BedrockModelProps {
    * TODO: default bedrock adapter based on model id
    */
   readonly adapter?: IModelAdapter;
+
+  /** Whether support streaming response */
+  readonly responseStreamingSupported?: boolean;
 }
 
 /**
