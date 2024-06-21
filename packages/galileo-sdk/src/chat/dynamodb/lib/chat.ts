@@ -6,25 +6,20 @@ import {
   QueryCommandInput,
   DeleteCommand,
   UpdateCommand,
+  GetCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 import { getAllChatMessageIds } from './messages.js';
 import { listChatMessageSources } from './sources.js';
-import {
-  getChatKey,
-  getChatsByTimeKey,
-  DDBChat,
-  bulkDelete,
-  Keys,
-  DDBUpdateOutput,
-  getAllByPagination,
-} from './util.js';
+import { DDBChat, DDBChatWorkflow, DDBGetOutput, DDBUpdateOutput, Keys } from './types.js';
+import { getChatKey, getChatsByTimeKey, bulkDelete, getAllByPagination } from './util.js';
 
 export async function createChat(
   documentClient: DynamoDBDocumentClient,
   tableName: string,
   userId: string,
   title: string,
+  workflow: DDBChatWorkflow,
 ) {
   const newChatSessionId = uuidv4();
 
@@ -36,6 +31,8 @@ export async function createChat(
     title: title,
     createdAt: timestamp,
     userId: userId,
+    workflowId: workflow.id,
+    workflowType: workflow.type,
     ...keys,
     ...gsiKeys,
     entity: 'CHAT',
@@ -53,6 +50,23 @@ export async function createChat(
     response,
     chat,
   };
+}
+
+export async function getChat(
+  documentClient: DynamoDBDocumentClient,
+  tableName: string,
+  userId: string,
+  chatId: string,
+) {
+  const keys = getChatKey(userId, chatId);
+
+  const command = new GetCommand({
+    TableName: tableName,
+    Key: keys,
+  });
+
+  const result = (await documentClient.send(command)) as DDBGetOutput<DDBChat>;
+  return result.Item;
 }
 
 export async function listAllChatsByTime(

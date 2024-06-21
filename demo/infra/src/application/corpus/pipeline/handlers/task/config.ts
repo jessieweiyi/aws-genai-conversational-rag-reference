@@ -99,7 +99,7 @@ async function lambdaHandler(state: State): Promise<Partial<ProcessingJobConfig>
     const prefix = (state.InputBucket.Prefix ?? '').replace(/^\\/, '');
 
     s3Input = {
-      LocalPath: state.LocalPath + prefix,
+      LocalPath: `${state.LocalPath}${prefix ? `/${prefix}/` : ''}`,
       S3Uri: `s3://${state.InputBucket.Bucket}/${prefix}`,
       S3DataDistributionType: 'ShardedByS3Key',
       S3DataType: 'S3Prefix',

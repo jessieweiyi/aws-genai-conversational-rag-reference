@@ -19,6 +19,10 @@ structure ChatDetailsMixin {
     // User ID of the creator of the chat session
     @required
     userId: String
+    // Workflow Id of the chat
+    workflowId: String
+    // Workflow Type of the chat
+    workflowType: String
     // Creation datetime
     createdAt: EpochTimestamp
 }
@@ -51,12 +55,34 @@ operation ListChats {
     errors: [ServerError, ClientError]
 }
 
+/// Type of flow to service the chat
+enum ChatFlowType {
+  /// Point the chat to a workflow to handle incoming messages
+  WORKFLOW = "WORKFLOW"
+  /// Point a chat directly at a workspace, useful for debugging. Equivalent to a workflow with a single workspace
+  WORKSPACE = "WORKSPACE"
+}
+
+/// Represents a workflow or workspace used to service a chat
+structure ChatWorkflow {
+  /// Workspace or workflow ID
+  @required
+  id: String
+
+  /// Workspace or workflow
+  @required
+  type: ChatFlowType
+}
+
 /// Create a chat session for a user
 @input
 structure CreateChatInput for CreateChat {
     // Title of the chat session
     @required
     title: String
+
+    @required
+    workflow: ChatWorkflow
 }
 
 structure CreateChatOutput for CreateChat with [ChatIdMixin, ChatDetailsMixin] {}

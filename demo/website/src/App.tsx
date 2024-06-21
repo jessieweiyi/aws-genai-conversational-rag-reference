@@ -12,14 +12,18 @@ import {
 import AppLayout from '@cloudscape-design/components/app-layout';
 import TopNavigation from '@cloudscape-design/components/top-navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useAppUser, useIsAdmin } from './Auth';
 import Config from './config.json';
-import ApiExplorer from './pages/ApiExplorer';
 import Chat from './pages/Chat';
-import CorpusSearch from './pages/CorpusSearch';
-import EmbeddingsTool from './pages/Embeddings';
-import Settings from './pages/Settings';
+import { CreateWorkflow } from './pages/workflows/WorkflowCreate';
+import { WorkflowDetails } from './pages/workflows/WorkflowDetails';
+import { WorkflowList } from './pages/workflows/WorkflowList';
+import { UpdateWorkflow } from './pages/workflows/WorkflowUpdate';
+import { CreateWorkspace } from './pages/workspaces/WorkspaceCreate';
+import { Workspace } from './pages/workspaces/WorkspaceDetails';
+import WorkspaceList from './pages/workspaces/WorkspaceList';
+import { UpdateWorkspace } from './pages/workspaces/WorkspaceUpdate';
 import { useHelpPanel, useSplitPanel } from './providers/AppLayoutProvider/managed-content';
 import { RiskProvider } from './providers/RiskProvider';
 
@@ -67,6 +71,25 @@ const App: React.FC = () => {
 
     if (isAdmin) {
       _navItems.push({
+        text: 'Admin',
+        type: 'expandable-link-group',
+        href: '#',
+        defaultExpanded: true,
+        items: [
+          {
+            text: 'Workspaces',
+            type: 'link',
+            href: '/workspaces',
+          },
+          {
+            text: 'Workflows',
+            type: 'link',
+            href: '/workflows',
+          },
+        ],
+      });
+
+      _navItems.push({
         text: 'Developer Tools',
         type: 'expandable-link-group',
         href: '#',
@@ -87,12 +110,6 @@ const App: React.FC = () => {
             type: 'link',
             href: '/corpus/embeddings',
           },
-          // TODO: enable settings once we implement it
-          // {
-          //   text: "Settings",
-          //   type: "link",
-          //   href: "/settings",
-          // },
         ],
       });
     }
@@ -146,10 +163,18 @@ const App: React.FC = () => {
             <Route path={'/chat'} element={<Chat />}>
               <Route path={':id'} element={<Chat />} />
             </Route>
-            <Route path="/apiExplorer" element={<ApiExplorer />} />
-            <Route path="/corpus/search" element={<CorpusSearch />} />
+            {/* <Route path="/apiExplorer" element={<ApiExplorer />} />
             <Route path="/corpus/embeddings" element={<EmbeddingsTool />} />
             <Route path={'/settings'} element={<Settings />} />
+            <Route path={'/'} element={<Navigate to="/chat" replace />} /> */}
+            <Route path="/workspaces" element={<WorkspaceList />} />
+            <Route path="/workspaces/create" element={<CreateWorkspace />} />
+            <Route path="/workspaces/:workspaceId/edit" element={<UpdateWorkspace />} />
+            <Route path="/workspaces/:workspaceId" element={<Workspace />} />
+            <Route path="/workflows" element={<WorkflowList />} />
+            <Route path="/workflows/create" element={<CreateWorkflow />} />
+            <Route path="/workflows/:workflowId/edit" element={<UpdateWorkflow />} />
+            <Route path="/workflows/:workflowId" element={<WorkflowDetails />} />
             <Route path={'/'} element={<Navigate to="/chat" replace />} />
           </Routes>
         }

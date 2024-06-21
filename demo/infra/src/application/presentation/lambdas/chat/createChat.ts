@@ -16,10 +16,10 @@ export const handler = createChatHandler(...interceptors, async ({ input, interc
   const userId = interceptorContext.callingIdentity?.identityId;
   if (!userId) throw new Error(`no userId was found in context`);
 
-  const title = input.body.title;
+  const { title, workflow } = input.body;
   if (!title || title.length === 0) throw new Error(`title is invalid`);
 
-  const { chat } = await createChat(documentClient, tableName, userId, title);
+  const { chat } = await createChat(documentClient, tableName, userId, title, workflow);
 
   const response: CreateChatResponseContent = {
     chatId: chat.chatId,

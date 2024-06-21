@@ -4,12 +4,12 @@ PDX-License-Identifier: Apache-2.0 */
 import { Alert } from '@cloudscape-design/components';
 import { FC, ReactNode } from 'react';
 
-export interface ErrorPageProps {
+export interface ErrorProps {
   readonly errors: any[];
   readonly header?: ReactNode;
 }
 
-export const ErrorPage: FC<ErrorPageProps> = ({ header, errors }) => {
+export const Error: FC<ErrorProps> = ({ header, errors }) => {
   return (
     <>
       {errors.map((err, idx) => (

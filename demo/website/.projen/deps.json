@@ -74,6 +74,10 @@
       "type": "build"
     },
     {
+      "name": "@types/react-pdf",
+      "type": "build"
+    },
+    {
       "name": "@types/swagger-ui-react",
       "type": "build"
     },
@@ -314,6 +318,10 @@
     },
     {
       "name": "react-markdown",
+      "type": "runtime"
+    },
+    {
+      "name": "react-pdf",
       "type": "runtime"
     },
     {

@@ -86,21 +86,32 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *DefaultApi* | [**create_chat**](docs/DefaultApi.md#create_chat) | **PUT** /chat | 
 *DefaultApi* | [**create_chat_message**](docs/DefaultApi.md#create_chat_message) | **PUT** /chat/{chatId}/message | 
+*DefaultApi* | [**create_workflow**](docs/DefaultApi.md#create_workflow) | **POST** /workflow | 
+*DefaultApi* | [**create_workspace**](docs/DefaultApi.md#create_workspace) | **POST** /workspace | 
 *DefaultApi* | [**delete_chat**](docs/DefaultApi.md#delete_chat) | **DELETE** /chat/{chatId} | 
 *DefaultApi* | [**delete_chat_message**](docs/DefaultApi.md#delete_chat_message) | **DELETE** /chat/{chatId}/message/{messageId} | 
+*DefaultApi* | [**delete_workflow**](docs/DefaultApi.md#delete_workflow) | **DELETE** /workflow/{workflowId} | 
+*DefaultApi* | [**delete_workspace**](docs/DefaultApi.md#delete_workspace) | **DELETE** /workspace/{workspaceId} | 
 *DefaultApi* | [**embed_documents**](docs/DefaultApi.md#embed_documents) | **POST** /corpus/embedding/embed-documents | 
 *DefaultApi* | [**embed_query**](docs/DefaultApi.md#embed_query) | **POST** /corpus/embedding/embed-query | 
 *DefaultApi* | [**embedding_model_inventory**](docs/DefaultApi.md#embedding_model_inventory) | **GET** /corpus/embedding/model-inventory | 
+*DefaultApi* | [**get_workflow**](docs/DefaultApi.md#get_workflow) | **GET** /workflow/{workflowId} | 
+*DefaultApi* | [**get_workspace**](docs/DefaultApi.md#get_workspace) | **GET** /workspace/{workspaceId} | 
 *DefaultApi* | [**l_lm_inventory**](docs/DefaultApi.md#l_lm_inventory) | **GET** /llm/inventory | 
 *DefaultApi* | [**list_chat_message_sources**](docs/DefaultApi.md#list_chat_message_sources) | **GET** /chat/{chatId}/message/{messageId}/source | 
 *DefaultApi* | [**list_chat_messages**](docs/DefaultApi.md#list_chat_messages) | **GET** /chat/{chatId} | 
 *DefaultApi* | [**list_chats**](docs/DefaultApi.md#list_chats) | **GET** /chat | 
+*DefaultApi* | [**list_workflows**](docs/DefaultApi.md#list_workflows) | **GET** /workflow | 
+*DefaultApi* | [**list_workspaces**](docs/DefaultApi.md#list_workspaces) | **GET** /workspace | 
 *DefaultApi* | [**similarity_search**](docs/DefaultApi.md#similarity_search) | **POST** /corpus/search/similarity | 
 *DefaultApi* | [**update_chat**](docs/DefaultApi.md#update_chat) | **POST** /chat/{chatId} | 
+*DefaultApi* | [**update_workflow**](docs/DefaultApi.md#update_workflow) | **PUT** /workflow/{workflowId} | 
+*DefaultApi* | [**update_workspace**](docs/DefaultApi.md#update_workspace) | **PUT** /workspace/{workspaceId} | 
 
 
 ## Documentation For Models
 
+ - [Aurora](docs/Aurora.md)
  - [Chat](docs/Chat.md)
  - [ChatEngineChainConfig](docs/ChatEngineChainConfig.md)
  - [ChatEngineConfig](docs/ChatEngineConfig.md)
@@ -108,15 +119,26 @@ Class | Method | HTTP request | Description
  - [ChatEngineMemoryConfig](docs/ChatEngineMemoryConfig.md)
  - [ChatEnginePromptRuntimeConfig](docs/ChatEnginePromptRuntimeConfig.md)
  - [ChatEngineSearchConfig](docs/ChatEngineSearchConfig.md)
+ - [ChatFlowType](docs/ChatFlowType.md)
  - [ChatMessage](docs/ChatMessage.md)
  - [ChatMessageSource](docs/ChatMessageSource.md)
+ - [ChatModel](docs/ChatModel.md)
+ - [ChatWorkflow](docs/ChatWorkflow.md)
  - [ClientErrorResponseContent](docs/ClientErrorResponseContent.md)
  - [CreateChatMessageRequestContent](docs/CreateChatMessageRequestContent.md)
  - [CreateChatMessageResponseContent](docs/CreateChatMessageResponseContent.md)
  - [CreateChatRequestContent](docs/CreateChatRequestContent.md)
  - [CreateChatResponseContent](docs/CreateChatResponseContent.md)
+ - [CreateWorkflowRequestContent](docs/CreateWorkflowRequestContent.md)
+ - [CreateWorkflowResponseContent](docs/CreateWorkflowResponseContent.md)
+ - [CreateWorkspaceRequestContent](docs/CreateWorkspaceRequestContent.md)
+ - [CreateWorkspaceResponseContent](docs/CreateWorkspaceResponseContent.md)
+ - [DataWorkspaceDefinition](docs/DataWorkspaceDefinition.md)
+ - [DataWorkspaceIndexing](docs/DataWorkspaceIndexing.md)
  - [DeleteChatMessageResponseContent](docs/DeleteChatMessageResponseContent.md)
  - [DeleteChatResponseContent](docs/DeleteChatResponseContent.md)
+ - [DeleteWorkflowResponseContent](docs/DeleteWorkflowResponseContent.md)
+ - [DeleteWorkspaceResponseContent](docs/DeleteWorkspaceResponseContent.md)
  - [DistanceStrategy](docs/DistanceStrategy.md)
  - [Document](docs/Document.md)
  - [EmbedDocumentsRequestContent](docs/EmbedDocumentsRequestContent.md)
@@ -125,13 +147,19 @@ Class | Method | HTTP request | Description
  - [EmbedQueryResponseContent](docs/EmbedQueryResponseContent.md)
  - [EmbeddingModel](docs/EmbeddingModel.md)
  - [EmbeddingModelInventoryResponseContent](docs/EmbeddingModelInventoryResponseContent.md)
+ - [GetWorkflowResponseContent](docs/GetWorkflowResponseContent.md)
+ - [GetWorkspaceResponseContent](docs/GetWorkspaceResponseContent.md)
  - [LLMInventoryResponseContent](docs/LLMInventoryResponseContent.md)
  - [ListChatMessageSourcesResponseContent](docs/ListChatMessageSourcesResponseContent.md)
  - [ListChatMessagesResponseContent](docs/ListChatMessagesResponseContent.md)
  - [ListChatsResponseContent](docs/ListChatsResponseContent.md)
+ - [ListWorkflowsResponseContent](docs/ListWorkflowsResponseContent.md)
+ - [ListWorkspacesResponseContent](docs/ListWorkspacesResponseContent.md)
  - [MessageType](docs/MessageType.md)
  - [NotAuthorizedErrorResponseContent](docs/NotAuthorizedErrorResponseContent.md)
  - [NotFoundErrorResponseContent](docs/NotFoundErrorResponseContent.md)
+ - [RouterWorkspace](docs/RouterWorkspace.md)
+ - [RouterWorkspaceDefinition](docs/RouterWorkspaceDefinition.md)
  - [ServerErrorResponseContent](docs/ServerErrorResponseContent.md)
  - [ServerTemporaryErrorResponseContent](docs/ServerTemporaryErrorResponseContent.md)
  - [SimilaritySearchRequestContent](docs/SimilaritySearchRequestContent.md)
@@ -140,6 +168,19 @@ Class | Method | HTTP request | Description
  - [StringMap](docs/StringMap.md)
  - [UpdateChatRequestContent](docs/UpdateChatRequestContent.md)
  - [UpdateChatResponseContent](docs/UpdateChatResponseContent.md)
+ - [UpdateWorkflowRequestContent](docs/UpdateWorkflowRequestContent.md)
+ - [UpdateWorkflowResponseContent](docs/UpdateWorkflowResponseContent.md)
+ - [UpdateWorkspaceRequestContent](docs/UpdateWorkspaceRequestContent.md)
+ - [UpdateWorkspaceResponseContent](docs/UpdateWorkspaceResponseContent.md)
+ - [VectorStorage](docs/VectorStorage.md)
+ - [Workflow](docs/Workflow.md)
+ - [WorkflowDefinition](docs/WorkflowDefinition.md)
+ - [Workspace](docs/Workspace.md)
+ - [WorkspaceDataImport](docs/WorkspaceDataImport.md)
+ - [WorkspaceDataImportStatus](docs/WorkspaceDataImportStatus.md)
+ - [WorkspaceEmbeddingModel](docs/WorkspaceEmbeddingModel.md)
+ - [WorkspacePrompt](docs/WorkspacePrompt.md)
+ - [WorkspaceType](docs/WorkspaceType.md)
 
 
 <a id="documentation-for-authorization"></a>

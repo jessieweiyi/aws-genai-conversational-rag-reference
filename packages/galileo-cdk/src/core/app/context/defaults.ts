@@ -37,6 +37,8 @@ export const DEFAULT_APPLICATION_CONFIG: ApplicationConfig = {
     //   },
     managedEmbeddings: {
       instanceType: 'ml.g4dn.xlarge',
+      embeddingsModelIds: ['sentence-transformers/all-mpnet-base-v2'],
+      defaultModel: 'sentence-transformers/all-mpnet-base-v2',
       embeddingsModels: [
         {
           // matching the current name used in database for our default model to prevent breaking existing data.

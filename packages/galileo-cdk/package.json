@@ -49,6 +49,7 @@
     "@aws-sdk/lib-dynamodb": "^3.556.0",
     "@aws-sdk/types": "^3.535.0",
     "@pnpm/logger": "*",
+    "@smithy/util-waiter": "*",
     "@types/fs-extra": "^11.0.3",
     "@types/jest": "^29.5.4",
     "@types/node": "^18",

@@ -24,7 +24,7 @@ const monorepo = new MonorepoProject({
     'node-localstorage',
     'prompts',
     'tsconfig-paths',
-    '@pnpm/logger'
+    '@pnpm/logger',
   ],
   tsconfig: {
     compilerOptions: {
@@ -113,6 +113,7 @@ const galileoSdk = new GalileoSdk(monorepo);
 
 const galileoCdkLib = new GalileoCdk(monorepo);
 galileoCdkLib.addBundledDeps(galileoSdk.package.packageName);
+galileoCdkLib.addDeps(galileoSdk.package.packageName);
 
 const galileoCli = new GalileoCli(monorepo);
 // CLI imports a few definitions from CDK package

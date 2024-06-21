@@ -107,7 +107,9 @@ export namespace ENV {
   export const EMBEDDING_TABLENAME = process.env.EMBEDDING_TABLENAME!;
   export const EMBEDDING_MODEL_ID = process.env.EMBEDDING_MODEL_ID!;
   export const EMBEDDING_MODEL_VECTOR_SIZE = parseInt(process.env.EMBEDDING_MODEL_VECTOR_SIZE || '768');
-  export const EMBEDDING_MODEL_REF_KEY = process.env.EMBEDDING_MODEL_REF_KEY;
+  export const WORKSPACE_ID = process.env.WORKSPACE_ID!;
+
+  export const WORKSPACE_TABLENAME = process.env.WORKSPACE_TABLENAME!;
 
   export const INDEXING_SKIP_DELTA_CHECK = envBool('INDEXING_SKIP_DELTA_CHECK', false);
 

@@ -26,6 +26,8 @@ export const handler = listChatsHandler(...interceptors, async ({ interceptorCon
     return {
       chatId: record.chatId,
       title: record.title,
+      workflowId: record.workflowId,
+      workflowType: record.workflowType,
       userId: record.userId,
       createdAt: record.createdAt,
     };

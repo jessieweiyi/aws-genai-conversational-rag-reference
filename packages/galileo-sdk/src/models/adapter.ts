@@ -2,9 +2,11 @@
 PDX-License-Identifier: Apache-2.0 */
 import { BaseSageMakerContentHandler } from '@langchain/community/llms/sagemaker_endpoint';
 import { set, get, isEmpty } from 'lodash';
-import { BaseChatTemplatePartials } from '../prompt/templates/chat/base.js';
-import { ChatTemplateTypedRuntimeRecord, PromptTemplateStore } from '../prompt/templates/store/registry.js';
-import { ChainType } from '../schema/index.js';
+import {
+  BaseChatTemplatePartials,
+  ChatCondenseQuestionPromptRuntime,
+  ChatQuestionAnswerPromptRuntime,
+} from '../prompt/templates/chat/index.js';
 
 /**
  * @struct
@@ -57,9 +59,11 @@ export interface IContentHandlerAdapter {
 /**
  * @struct
  */
-export type IChatPromptAdapter = {
+export interface IChatPromptAdapter {
   readonly base?: Partial<BaseChatTemplatePartials>;
-} & Partial<ChatTemplateTypedRuntimeRecord>;
+  readonly questionAnswer?: ChatQuestionAnswerPromptRuntime;
+  readonly condenseQuestion?: ChatCondenseQuestionPromptRuntime;
+}
 /**
  * @struct
  */
@@ -68,58 +72,31 @@ export interface IPromptAdapter {
 }
 
 export class PromptAdapter implements IPromptAdapter {
-  private static resolveRuntime(
-    type: ChainType,
-    base?: Partial<BaseChatTemplatePartials>,
-    runtime?: string | any,
-  ): any | undefined {
-    if (runtime == null) {
-      if (base == null) return undefined;
-      return {
-        templatePartials: {
-          ...base,
-        },
-      };
-    }
-
-    if (typeof runtime === 'string') {
-      // TODO: support non-system templates once we implement store
-      // this will throw error if invalid template scope/type/substype
-      const parsedId = PromptTemplateStore.parseId(runtime, {
-        scope: PromptTemplateStore.SYSTEM_SCOPE,
-        type: PromptTemplateStore.CHAT_TYPE,
-        subtype: type,
-      });
-      runtime = PromptTemplateStore.getSystemChatTemplateRuntime(type, parsedId.name);
-    }
-
-    return {
-      ...runtime,
-      templatePartials: {
-        ...base,
-        ...runtime.templatePartials,
-      },
-    };
-  }
-
   readonly chat?: IChatPromptAdapter;
 
   constructor(adapter?: IPromptAdapter) {
-    const { base, ...typed } = adapter?.chat || {};
-
     this.chat = {
-      base,
-      ...Object.fromEntries(
-        Object.values(ChainType).map((type) => {
-          if (type in typed) {
-            return [type, PromptAdapter.resolveRuntime(type, base, typed[type])];
-          } else if (!isEmpty(base)) {
-            return [type, PromptAdapter.resolveRuntime(type, base)];
-          } else {
-            return [type, undefined];
-          }
-        }),
-      ),
+      base: adapter?.chat?.base,
+      condenseQuestion:
+        adapter?.chat?.base || adapter?.chat?.condenseQuestion
+          ? {
+              ...adapter.chat.condenseQuestion,
+              templatePartials: {
+                ...adapter.chat.base,
+                ...adapter.chat.condenseQuestion?.templatePartials,
+              },
+            }
+          : undefined,
+      questionAnswer:
+        adapter?.chat?.base || adapter?.chat?.questionAnswer
+          ? {
+              ...adapter.chat.questionAnswer,
+              templatePartials: {
+                ...adapter.chat.base,
+                ...adapter.chat.questionAnswer?.templatePartials,
+              },
+            }
+          : undefined,
     };
   }
 }

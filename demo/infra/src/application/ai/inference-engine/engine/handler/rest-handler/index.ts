@@ -1,7 +1,11 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
 import { interceptors, corsInterceptor, IInterceptorContext, ApiResponse } from 'api-typescript-interceptors';
-import { CreateChatMessageResponseContent, createChatMessageHandler } from 'api-typescript-runtime';
+import {
+  CreateChatMessageResponseContent,
+  ServerTemporaryErrorResponseContent,
+  createChatMessageHandler,
+} from 'api-typescript-runtime';
 import { createMessage } from '../shared/create-message';
 import { isAdmin } from '../shared/types';
 
@@ -27,6 +31,7 @@ export const handler = createChatMessageHandler(...INTERCEPTORS, async ({ input,
     userId,
     idToken,
     isAdmin: _isAdmin,
+
     chatId,
     question,
     userConfigParam,
@@ -34,8 +39,8 @@ export const handler = createChatMessageHandler(...INTERCEPTORS, async ({ input,
     useStreaming: false,
   });
 
-  if (result.errorMessage) {
-    return ApiResponse.temporaryFailure(result);
+  if ((result as ServerTemporaryErrorResponseContent).errorMessage) {
+    return ApiResponse.temporaryFailure(result as ServerTemporaryErrorResponseContent);
   }
 
   return ApiResponse.success(result as CreateChatMessageResponseContent);

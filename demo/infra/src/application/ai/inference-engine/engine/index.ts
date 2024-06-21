@@ -28,6 +28,8 @@ export interface InferenceEngineProps {
   readonly foundationModelCrossAccountRoleArn?: string;
   readonly chatMessageTable: ITable;
   readonly chatMessageTableGsiIndexName: string;
+  readonly workspaceTable: ITable;
+  readonly workflowTable: ITable;
   readonly wsConnectionsTable: ITable;
   readonly chatDomain: string;
   readonly vpc: ec2.IVpc;
@@ -122,6 +124,9 @@ export class InferenceEngine extends Construct implements IInferenceEngine {
 
     props.foundationModelInventorySecret.grantRead(this.role);
     props.chatMessageTable.grantReadWriteData(this.role);
+    props.workflowTable.grantReadData(this.role);
+    props.workspaceTable.grantReadData(this.role);
+
     NagSuppressions.addResourceSuppressions(
       this.role,
       [
@@ -141,6 +146,8 @@ export class InferenceEngine extends Construct implements IInferenceEngine {
       FOUNDATION_MODEL_CROSS_ACCOUNT_ROLE_ARN: props?.foundationModelCrossAccountRoleArn,
       CHAT_MESSAGE_TABLE_NAME: props.chatMessageTable.tableName,
       CHAT_MESSAGE_TABLE_GSI_INDEX_NAME: props.chatMessageTableGsiIndexName,
+      WORKSPACE_TABLE_NAME: props.workspaceTable.tableName,
+      WORKFLOW_TABLE_NAME: props.workflowTable.tableName,
       ADMIN_GROUPS: JSON.stringify(props.adminGroups || []),
       DOMAIN: props.chatDomain,
     } as ILambdaEnvironment;

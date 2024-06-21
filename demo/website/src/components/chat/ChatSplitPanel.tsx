@@ -5,7 +5,6 @@ import { Chat } from 'api-typescript-react-query-hooks';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import ChatPanel from './ChatPanel';
 import ChatsList from './ChatsList';
-import { ChatConfigSplitPanel } from './dev-settings/ChatConfigSplitPanel';
 
 type SessionsProps = {
   chats: Chat[];
@@ -60,7 +59,6 @@ export default function Sessions({ chats, loading }: SessionsProps) {
           {selectedChat && (
             <>
               <ChatPanel chat={selectedChat} />
-              <ChatConfigSplitPanel />
             </>
           )}
         </div>

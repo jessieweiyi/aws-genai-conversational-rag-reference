@@ -79,6 +79,7 @@ structure CreateChatMessageInput for CreateChatMessage {
     @required
     @httpLabel
     chatId: String
+
     @required
     question: String
 

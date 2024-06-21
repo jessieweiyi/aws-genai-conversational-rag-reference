@@ -5,7 +5,7 @@ import { ServiceQuotas, SecureBucket } from '@aws/galileo-cdk/lib/common';
 import { ApplicationContext } from '@aws/galileo-cdk/lib/core/app';
 import { RDSVectorStore } from '@aws/galileo-cdk/lib/data';
 import { ArnFormat, CfnOutput, Duration, RemovalPolicy, Size, Stack } from 'aws-cdk-lib';
-import { Table } from 'aws-cdk-lib/aws-dynamodb';
+import { ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { IVpc, Port, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
@@ -64,6 +64,7 @@ export interface IndexingPipelineOptions {
 export interface IndexingPipelineProps extends IndexingPipelineOptions {
   readonly vpc: IVpc;
   readonly cacheTable: Table;
+  readonly workspaceTable: ITable;
   readonly inputBucket: IBucket;
   readonly inputBucketPrefix?: string;
   readonly vectorStore: RDSVectorStore;
@@ -126,6 +127,7 @@ export class IndexingPipeline extends Construct {
         ...additionalEnvironment,
         INDEXING_BUCKET: props.inputBucket.bucketName,
         INDEXING_CACHE_TABLE: props.cacheTable.tableName,
+        WORKSPACE_TABLE: props.workspaceTable.tableName,
         // Config task already optimizes the s3 objects (bulk or manifest) so no need to check in container
         INDEXING_SKIP_DELTA_CHECK: '1',
         AWS_DEFAULT_REGION: Stack.of(this).region,
@@ -160,6 +162,8 @@ export class IndexingPipeline extends Construct {
         ...additionalEnvironment,
       },
     });
+
+    props.workspaceTable.grantReadData(startTaskLambda);
 
     const startTask = new tasks.LambdaInvoke(this, 'StartTask', {
       lambdaFunction: startTaskLambda,

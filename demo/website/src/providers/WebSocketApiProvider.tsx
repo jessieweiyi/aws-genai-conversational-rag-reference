@@ -6,7 +6,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { DefaultApiWebSocketClient } from 'ws-api-typescript-websocket-client';
 import { DefaultApiWebSocketClientProvider } from 'ws-api-typescript-websocket-hooks';
 import { useRuntimeConfig, useGetIdToken } from '../Auth';
-import { ErrorPage } from '../components/error';
+import { Error } from '../components/error';
 
 const useWebSocketApiClient = () => {
   // Use a ref to ensure that if the effect is retriggered, we do not create a second connection
@@ -49,7 +49,7 @@ export const WsApiProvider: FC<React.PropsWithChildren> = ({ children }) => {
   return client ? (
     <DefaultApiWebSocketClientProvider client={client}>{children}</DefaultApiWebSocketClientProvider>
   ) : errors ? (
-    <ErrorPage header="Error while establishing websocket connection" errors={errors} />
+    <Error header="Error while establishing websocket connection" errors={errors} />
   ) : (
     <>
       Establishing websocket connection <Spinner />

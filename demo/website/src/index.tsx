@@ -8,7 +8,6 @@ import App from './App';
 import Auth from './Auth';
 import { ApiProvider } from './providers/ApiProvider';
 import { AppLayoutProvider } from './providers/AppLayoutProvider';
-import ChatEngineConfigProvider from './providers/ChatEngineConfig';
 import { FlagsProvider } from './providers/FlagsProvider';
 import { WsApiProvider } from './providers/WebSocketApiProvider';
 import reportWebVitals from './reportWebVitals';
@@ -31,9 +30,7 @@ createRoot(document.getElementById('root')!).render(
             <ApiProvider>
               <WsApiProvider>
                 <AppLayoutProvider>
-                  <ChatEngineConfigProvider>
-                    <App />
-                  </ChatEngineConfigProvider>
+                  <App />
                 </AppLayoutProvider>
               </WsApiProvider>
             </ApiProvider>

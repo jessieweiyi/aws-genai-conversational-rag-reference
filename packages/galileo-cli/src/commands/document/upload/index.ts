@@ -41,14 +41,14 @@ export default class DocumentUploadCommand extends Command {
       ),
     );
 
-    const { modelRefKey } = context.cachedAnswers(
+    const { workspaceId } = context.cachedAnswers(
       await prompts([
         {
           type: 'text',
-          name: 'modelRefKey',
-          message: 'Enter the model reference key for the embedding model',
+          name: 'workspaceId',
+          message: 'Enter the workspace Id for the document upload',
           min: 1,
-          validate: (value: string) => (value && value.trim().length > 0) || 'Model reference key is required',
+          validate: (value: string) => (value && value.trim().length > 0) || 'Workspace Id is required',
           initial: flags.modelRefKey,
         },
       ]),
@@ -154,7 +154,7 @@ export default class DocumentUploadCommand extends Command {
           Prefix: uploadKeyPrefix,
         },
         Environment: {
-          EMBEDDING_MODEL_REF_KEY: modelRefKey.trim(),
+          WORKSPACE_ID: workspaceId.trim(),
         },
       }),
     );

@@ -1,26 +1,56 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
-import { BASE_CHAT_PARTIALS } from './base.js';
-import { PromptRuntime } from '../../types.js';
+import { BaseMessage } from 'langchain/schema';
+import { BASE_CHAT_PARTIALS, ChatTemplatePartials } from './base.js';
+import { DEFAULT_PROMPT_TEMPLATES } from './default-prompt-templates.js';
+import {
+  HandlebarsPromptTemplate,
+  HandlebarsPromptTemplateRuntime,
+  ScopedHandlebarsPromptTemplateInput,
+} from '../../handlebars.js';
 
-export const TEMPLATE = `Given the following chat history contained in ''' characters, and the "Followup Question" below, rephrase the "Followup Question" to be a concise standalone question in its original language.
-Without answering the question, return only the standalone question.
+export const CHAT_CONDENSE_QUESTION_PARTIALS: ChatTemplatePartials = {
+  ...BASE_CHAT_PARTIALS,
+  Context: '{{>Dialog}}',
+  Instruction:
+    'Given the following conversational dialog {{~>DelimitedBy}}, and the "Followup Question" below, rephrase the "Followup Question" to be a concise standalone question in its original language. Without answering the question, return only the standalone question.',
+  Cue: 'Followup Question: {{question}}{{>LF}}Standalone Question: ',
+} as const;
 
-Chat history: '''
-{{>ChatHistory}}
-'''
+export interface ChatCondenseQuestionPromptTemplateInputValues {
+  readonly chat_history: BaseMessage[];
+  readonly question: string;
+}
 
-Followup Question: {{question}}
-Standalone Question: `;
+export type ChatCondenseQuestionPromptTemplateInput = ScopedHandlebarsPromptTemplateInput<
+  ChatTemplatePartials,
+  ChatCondenseQuestionPromptTemplateInputValues
+>;
+export type ChatCondenseQuestionPromptRuntime =
+  HandlebarsPromptTemplateRuntime<ChatCondenseQuestionPromptTemplateInput>;
 
-export const PROMPT_TEMPLATE: Required<PromptRuntime> = {
-  root: true,
-  template: TEMPLATE,
-  inputVariables: ['chat_history', 'question'],
-  templatePartials: {
-    ...BASE_CHAT_PARTIALS,
-  },
-  partialVariables: {},
-};
+export class ChatCondenseQuestionPromptTemplate extends HandlebarsPromptTemplate<
+  ChatTemplatePartials,
+  ChatCondenseQuestionPromptTemplateInputValues
+> {
+  public static defaultTemplate = DEFAULT_PROMPT_TEMPLATES.condense;
 
-export default PROMPT_TEMPLATE;
+  static async deserialize(data: any) {
+    return new ChatCondenseQuestionPromptTemplate(data);
+  }
+
+  constructor(input: ChatCondenseQuestionPromptTemplateInput) {
+    super({
+      template: ChatCondenseQuestionPromptTemplate.defaultTemplate,
+      inputVariables: ['chat_history', 'question'],
+      ...input,
+      partialVariables: {
+        ...input.partialVariables,
+      },
+      templatePartials: {
+        ...CHAT_CONDENSE_QUESTION_PARTIALS,
+        ...input.templatePartials,
+      },
+    });
+  }
+}

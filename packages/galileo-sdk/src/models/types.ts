@@ -96,6 +96,25 @@ export interface IEmbeddingModelInfo extends IBaseModelInfo {
   readonly modelRefKey: string;
 }
 
+export interface IEmbeddingModelInfo1 extends IBaseModelInfo {
+  // TODO: placeholder for supporting additional embedding model providers
+  /** Model frameworks which defines details on invoking the model based on framework specifics */
+  // readonly framework?: IModelFramework;
+  // /** Model adapter spec */
+  // readonly adapter?: IEmbeddingModelAdapter;
+
+  /** Dimension such as vector size of the embeddings */
+  readonly dimensions: number;
+  /**
+   * The model ID
+   */
+  readonly modelId: string;
+  /**
+   * Indicates if this is the default model
+   */
+  default?: boolean;
+}
+
 export function isManagedDefaultFramework(framework?: IModelFramework): framework is ISageMakerEndpointModelFramework {
   return framework?.type === ModelFramework.SAGEMAKER_ENDPOINT;
 }

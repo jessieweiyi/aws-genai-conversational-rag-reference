@@ -9,7 +9,7 @@ import { INTERCEPTOR_IAM_ACTIONS } from 'api-typescript-interceptors';
 import { OperationLookup } from 'api-typescript-runtime';
 import { Duration, Size } from 'aws-cdk-lib';
 import { EnableScalingProps } from 'aws-cdk-lib/aws-applicationautoscaling';
-import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, ITable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { IVpc, SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -40,6 +40,7 @@ export interface CorpusProps extends MonitoredNestedStackProps {
   readonly embeddingInstanceType?: string;
   readonly embeddingModels: IEmbeddingModelInfo[];
   readonly embeddingModelAutoScaling?: EnableScalingProps;
+  readonly workspaceTable: ITable;
   /**
    * Max requests per second (RPS) for embedding model autoscaling.
    * @default 10
@@ -189,6 +190,7 @@ export class CorpusStack extends MonitoredNestedStack {
     this.pipeline = new IndexingPipeline(this, 'Pipeline', {
       dockerImagePath: props.dockerImagePath,
       cacheTable,
+      workspaceTable: props.workspaceTable,
       vpc: props.vpc,
       inputBucket: this.processedDataBucket,
       vectorStore: this.vectorStore,

@@ -114,6 +114,8 @@ export interface ApplicationConfig {
       datasets: SampleDataSets[];
     };
     managedEmbeddings: {
+      embeddingsModelIds?: string[];
+      defaultModel?: string;
       // TODO: support additional embedding models, currently just the default ManagedEmbedding model to match current
       embeddingsModels: IEmbeddingModelInfo[];
       instanceType?: string;

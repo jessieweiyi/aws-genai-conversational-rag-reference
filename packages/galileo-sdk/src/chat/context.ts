@@ -12,9 +12,6 @@ import { resolveFoundationModelCredentials } from '../models/cross-account.js';
 import { FoundationModelInventory } from '../models/index.js';
 import { resolveModelAdapter } from '../models/llms/utils.js';
 import { IModelInfo, Kwargs, isBedrockFramework, isSageMakerEndpointFramework } from '../models/types.js';
-import { resolvePromptTemplateByChainType } from '../prompt/templates/store/resolver.js';
-import { PromptRuntime } from '../prompt/types.js';
-import { ChainType } from '../schema/index.js';
 import { omitManagedBedrockKwargs } from '../utils/bedrock.js';
 
 const logger = getLogger('chat/adapter');
@@ -26,6 +23,14 @@ export interface ResolvedLLM {
 }
 
 export type ResolvableModelInfo = string | IModelInfo | Partial<IModelInfo>;
+
+export interface IChatEngineContextOptions {
+  readonly maxNewTokens: number;
+  readonly modelKwargs?: Kwargs;
+  readonly endpointKwargs?: Kwargs;
+  readonly verbose?: boolean;
+  readonly prompt: PromptTemplate;
+}
 
 export class ChatEngineContext {
   static async resolveModelInfo(modelInfo: ResolvableModelInfo | undefined): Promise<IModelInfo> {
@@ -51,29 +56,41 @@ export class ChatEngineContext {
     return modelInfo as IModelInfo;
   }
 
-  static async resolveLLM(
-    modelInfo?: IModelInfo,
-    options?: { verbose?: boolean; modelKwargs?: Kwargs; endpointKwargs?: Kwargs },
-  ): Promise<ResolvedLLM> {
-    modelInfo ??= await ChatEngineContext.resolveModelInfo(modelInfo);
-    let adapter = resolveModelAdapter(modelInfo);
+  readonly llm: BaseLanguageModel;
+  readonly prompt: PromptTemplate;
 
-    let llm: BaseLanguageModel;
+  readonly modelInfo: IModelInfo;
+  readonly maxNewTokens: number;
+
+  readonly adapter: ModelAdapter;
+
+  constructor(modelInfo: IModelInfo, options: IChatEngineContextOptions) {
+    this.modelInfo = modelInfo;
+    this.maxNewTokens = options.maxNewTokens;
+
+    logger.debug('LLM configuration', { modelInfo, options });
+
+    this.adapter = resolveModelAdapter(modelInfo);
+    logger.debug('ModelAdapter:', {
+      isDefault: this.adapter.isDefault,
+      adapter: this.adapter.isDefault ? undefined : this.adapter,
+    });
+
     if (isSageMakerEndpointFramework(modelInfo.framework)) {
       const { endpointName, endpointRegion, role } = modelInfo.framework;
 
       const endpointKwargs = {
         ...modelInfo.framework.endpointKwargs,
-        ...options?.endpointKwargs,
+        ...options.endpointKwargs,
       };
       const modelKwargs = {
         ...modelInfo.framework.modelKwargs,
-        ...options?.modelKwargs,
+        ...options.modelKwargs,
       };
       logger.debug('Resolved sagemaker kwargs', { endpointKwargs, modelKwargs });
 
-      llm = new SageMakerEndpoint({
-        verbose: options?.verbose,
+      this.llm = new SageMakerEndpoint({
+        verbose: options.verbose,
         // Support cross-account endpoint if enabled and provided in env
         // Otherwise default to execution role creds
         clientOptions: {
@@ -81,7 +98,7 @@ export class ChatEngineContext {
           credentials: resolveFoundationModelCredentials(role),
         },
         endpointName: endpointName,
-        contentHandler: adapter.contentHandler,
+        contentHandler: this.adapter.contentHandler,
         endpointKwargs,
         modelKwargs,
       });
@@ -92,13 +109,13 @@ export class ChatEngineContext {
         maxTokens: DEFAULT_MAX_NEW_TOKENS,
         temperature: 0,
         ...modelInfo.framework.modelKwargs,
-        ...options?.endpointKwargs,
-        ...options?.modelKwargs,
+        ...options.endpointKwargs,
+        ...options.modelKwargs,
       };
       logger.debug('Resolved bedrock kwargs', { modelKwargs });
 
-      llm = new BedrockChat({
-        verbose: options?.verbose,
+      this.llm = new BedrockChat({
+        verbose: options.verbose,
         // Support cross-account endpoint if enabled and provided in env
         // Otherwise default to execution role credentials
         credentials: resolveFoundationModelCredentials(role),
@@ -113,16 +130,10 @@ export class ChatEngineContext {
       throw new Error(`Model Framework "${modelInfo.framework.type}" is not supported/implemented`);
     }
 
-    const resolved: ResolvedLLM = { llm, modelInfo, adapter };
-    logger.debug('Resolved LLM:', { modelInfo, adapter, llm: llm.toJSON() });
+    this.prompt = options.prompt;
 
-    return resolved;
-  }
-
-  static async resolvePromptTemplate(
-    type: ChainType,
-    ...runtime: (string | PromptRuntime | undefined)[]
-  ): Promise<PromptTemplate> {
-    return resolvePromptTemplateByChainType(type, ...runtime);
+    logger.debug('Prompt', {
+      prompt: this.prompt.serialize(),
+    });
   }
 }

@@ -1,0 +1,10 @@
+{
+    "apiUrl": "https://ktoyenmlzg.execute-api.us-east-1.amazonaws.com/prod/",
+    "region": "us-east-1",
+    "identityPoolId": "us-east-1:46f02b38-6576-4094-b377-0bce8eaeb552",
+    "inferenceBufferedFunctionUrl": "https://hxt4ntdw2t3t2n22rspzupg2fi0lbaum.lambda-url.us-east-1.on.aws/",
+    "userPoolId": "us-east-1_XZgQf8kLU",
+    "userPoolWebClientId": "2ceqv9bduv1j15tdu7t1nee23a",
+    "wsApiUrl": "wss://nvh8qngszi.execute-api.us-east-1.amazonaws.com/default",
+    "dataSovereigntyRisk": false
+}

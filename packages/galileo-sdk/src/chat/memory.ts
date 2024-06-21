@@ -1,8 +1,8 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
 import { BufferWindowMemory, BufferWindowMemoryInput, getInputValue, BaseMemory } from 'langchain/memory';
-import { DDBChatMessage, DDBMessageSource } from './dynamodb/lib/index.js';
 import { CreateAIChatMessageResponse, CreateHumanChatMessageResponse } from './dynamodb/lib/messages.js';
+import { DDBChatMessage, DDBMessageSource } from './dynamodb/lib/types.js';
 import { DynamoDBChatMessageHistory } from './dynamodb/message-history.js';
 import { getLogger } from '../common/index.js';
 

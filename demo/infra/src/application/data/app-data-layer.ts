@@ -8,6 +8,9 @@ export interface AppDataLayerProps {}
 
 export class AppDataLayer extends Construct {
   readonly datastore: ITable;
+  readonly workspaceDataStore: ITable;
+  readonly workflowDataStore: ITable;
+
   readonly gsiIndexName = 'GSI1';
 
   readonly wsConnections: ITable;
@@ -42,6 +45,26 @@ export class AppDataLayer extends Construct {
         name: 'GSI1SK',
         type: AttributeType.STRING,
       },
+    });
+
+    this.workspaceDataStore = new Table(this, 'WorkspaceDatastore', {
+      partitionKey: {
+        name: 'workspaceId',
+        type: AttributeType.STRING,
+      },
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      removalPolicy: stageAwareRemovalPolicy(this),
+      pointInTimeRecovery: !dev,
+    });
+
+    this.workflowDataStore = new Table(this, 'WorkflowDatastore', {
+      partitionKey: {
+        name: 'workflowId',
+        type: AttributeType.STRING,
+      },
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      removalPolicy: stageAwareRemovalPolicy(this),
+      pointInTimeRecovery: !dev,
     });
 
     this.datastore = datastore;

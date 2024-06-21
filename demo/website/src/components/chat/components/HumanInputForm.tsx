@@ -8,10 +8,8 @@ import { nanoid } from 'nanoid';
 import { useCallback, useEffect, useState } from 'react';
 import { useDefaultApiWebSocketClient, useOnUpdateInferenceStatus } from 'ws-api-typescript-websocket-hooks';
 import { useCreateChatMessageMutation, useUseStreaming } from '../../../hooks';
-import { useChatEngineConfig } from '../../../providers/ChatEngineConfig';
 
 export default function HumanInputForm(props: { chat: Chat; onSuccess?: () => void }) {
-  const [options] = useChatEngineConfig();
   const [currentHumanMessage, setCurrentHumanMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -48,7 +46,6 @@ export default function HumanInputForm(props: { chat: Chat; onSuccess?: () => vo
         chatId: props.chat.chatId,
         question: currentHumanMessage,
         tmpMessageId: nanoid(32),
-        options,
       });
     } else {
       await createChatMessage.mutateAsync({
@@ -56,7 +53,6 @@ export default function HumanInputForm(props: { chat: Chat; onSuccess?: () => vo
         // @ts-ignore - incorrect
         createChatMessageRequestContent: {
           question: currentHumanMessage,
-          options,
         },
       });
     }

@@ -73,6 +73,8 @@ export class PresentationStack extends NestedStack {
       vpc,
       chatMessageTable: appData.datastore,
       chatMessageTableGsiIndexName: appData.gsiIndexName,
+      workflowTable: appData.workflowDataStore,
+      workspaceTable: appData.workspaceDataStore,
       wsConnectionsTable: appData.wsConnections,
       chatDomain: config.chat.domain,
       searchUrl: corpus.searchUrl,
@@ -155,6 +157,82 @@ export class PresentationStack extends NestedStack {
       lLMInventory: llmInventoryFn,
     };
 
+    const createWorkspaceFn = new NodejsFunction(this, 'createWorkspace-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workspaces/createWorkspace'),
+    });
+
+    const getWorkspaceFn = new NodejsFunction(this, 'getWorkspace-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workspaces/getWorkspace'),
+    });
+
+    const listWorkspacesFn = new NodejsFunction(this, 'listWorkspaces-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workspaces/listWorkspaces'),
+    });
+
+    const deleteWorkspaceFn = new NodejsFunction(this, 'deleteWorkspace-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workspaces/deleteWorkspace'),
+    });
+
+    const updateWorkspaceFn = new NodejsFunction(this, 'updateWorkspace-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workspaces/updateWorkspace'),
+    });
+
+    const workspacesLambdas: Record<string, Function> = {
+      createWorkspace: createWorkspaceFn,
+      getWorkspace: getWorkspaceFn,
+      listWorkspaces: listWorkspacesFn,
+      updateWorkspace: updateWorkspaceFn,
+      deleteWorkspace: deleteWorkspaceFn,
+    };
+
+    const createWorkflowFn = new NodejsFunction(this, 'createWorkflow-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workflows/createWorkflow'),
+    });
+
+    const getWorkflowFn = new NodejsFunction(this, 'getWorkflow-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workflows/getWorkflow'),
+    });
+
+    const listWorkflowsFn = new NodejsFunction(this, 'listWorkflows-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workflows/listWorkflows'),
+    });
+
+    const deleteWorkflowFn = new NodejsFunction(this, 'deleteWorkflow-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workflows/deleteWorkflow'),
+    });
+
+    const updateWorkflowFn = new NodejsFunction(this, 'updateWorkflow-Lambda', {
+      handler: 'handler',
+      runtime: NODE_RUNTIME,
+      entry: require.resolve('./lambdas/workflows/updateWorkflow'),
+    });
+
+    const workflowLambdas: Record<string, Function> = {
+      createWorkflow: createWorkflowFn,
+      getWorkflow: getWorkflowFn,
+      listWorkflows: listWorkflowsFn,
+      updateWorkflow: updateWorkflowFn,
+      deleteWorkflow: deleteWorkflowFn,
+    };
+
     const corpusApiIntegration = Integrations.lambda(corpus.corpusApiFn);
 
     // Create the API
@@ -167,7 +245,11 @@ export class PresentationStack extends NestedStack {
       // Supply an integration for every operation
       integrations: {
         ...MockIntegrations.mockAll(),
-        ...Object.entries(lambdas).reduce((accum, [_path, _fn]) => {
+        ...[
+          ...Object.entries(lambdas),
+          ...Object.entries(workspacesLambdas),
+          ...Object.entries(workflowLambdas),
+        ].reduce((accum, [_path, _fn]) => {
           accum = {
             ...accum,
             [_path]: {
@@ -243,42 +325,40 @@ export class PresentationStack extends NestedStack {
     });
 
     Object.values(lambdas).forEach((lambda) => {
-      // interceptor access (identity)
-      lambda.addToRolePolicy(
-        new PolicyStatement({
-          sid: 'ApiInterceptors',
-          effect: Effect.ALLOW,
-          // TODO: the action and resources required should be handled by the api-typescript-interceptors package
-          actions: [...INTERCEPTOR_IAM_ACTIONS],
-          resources: [
-            Stack.of(this).formatArn({
-              resource: 'userpool',
-              resourceName: identity.userPoolId,
-              service: 'cognito-idp',
-              arnFormat: ArnFormat.SLASH_RESOURCE_NAME,
-            }),
-          ],
-        }),
-      );
+      this._addLambdaAPIInterceptorPermission(lambda, identity);
       // table
       lambda.addEnvironment('TABLE_NAME', appData.datastore.tableName);
       lambda.addEnvironment('GSI_INDEX_NAME', appData.gsiIndexName);
       appData.datastore.grantReadWriteData(lambda);
-      NagSuppressions.addResourceSuppressions(
-        this,
-        [
-          {
-            id: 'AwsPrototyping-IAMNoManagedPolicies',
-            reason: 'AWS lambda basic execution role is acceptable since it allows for logging',
-          },
-          {
-            id: 'AwsPrototyping-IAMNoWildcardPermissions',
-            reason: 'Actions are scoped. Resource is scoped to specific DDB resource, /index/* is required',
-          },
-        ],
-        true,
-      );
     });
+
+    Object.values(workspacesLambdas).forEach((lambda) => {
+      this._addLambdaAPIInterceptorPermission(lambda, identity);
+      // table
+      lambda.addEnvironment('TABLE_NAME', appData.workspaceDataStore.tableName);
+      appData.workspaceDataStore.grantReadWriteData(lambda);
+    });
+
+    Object.values(workflowLambdas).forEach((lambda) => {
+      this._addLambdaAPIInterceptorPermission(lambda, identity);
+      lambda.addEnvironment('TABLE_NAME', appData.workflowDataStore.tableName);
+      appData.workflowDataStore.grantReadWriteData(lambda);
+    });
+
+    NagSuppressions.addResourceSuppressions(
+      this,
+      [
+        {
+          id: 'AwsPrototyping-IAMNoManagedPolicies',
+          reason: 'AWS lambda basic execution role is acceptable since it allows for logging',
+        },
+        {
+          id: 'AwsPrototyping-IAMNoWildcardPermissions',
+          reason: 'Actions are scoped. Resource is scoped to specific DDB resource, /index/* is required',
+        },
+      ],
+      true,
+    );
 
     const policy = new Policy(this, 'ApiAuthenticatedRolePolicy', {
       roles: [identity.authenticatedUserRole],
@@ -377,5 +457,25 @@ export class PresentationStack extends NestedStack {
     }
 
     return GeoRestriction.allowlist(...value);
+  }
+
+  /** @internal */
+  _addLambdaAPIInterceptorPermission(lambda: IFunction, identity: IIdentityLayer) {
+    lambda.addToRolePolicy(
+      new PolicyStatement({
+        sid: 'ApiInterceptors',
+        effect: Effect.ALLOW,
+        // TODO: the action and resources required should be handled by the api-typescript-interceptors package
+        actions: [...INTERCEPTOR_IAM_ACTIONS],
+        resources: [
+          Stack.of(this).formatArn({
+            resource: 'userpool',
+            resourceName: identity.userPoolId,
+            service: 'cognito-idp',
+            arnFormat: ArnFormat.SLASH_RESOURCE_NAME,
+          }),
+        ],
+      }),
+    );
   }
 }

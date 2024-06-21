@@ -49,6 +49,7 @@ export class Website {
         'react-markdown',
         'use-immer',
         'usehooks-ts',
+        'react-pdf',
         galileoSdk.package.packageName,
       ],
       devDeps: [
@@ -56,6 +57,7 @@ export class Website {
         '@types/assert',
         '@types/jest',
         '@types/lodash',
+        '@types/react-pdf',
         'console-browserify',
         'crypto-browserify',
         'msw-storybook-addon',

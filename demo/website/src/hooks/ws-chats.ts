@@ -1,31 +1,30 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
-import { ModelFramework } from '@aws/galileo-sdk/lib/models/types';
+// import { ModelFramework } from '@aws/galileo-sdk/lib/models/types';
 import { ChatMessage } from 'api-typescript-react-query-hooks';
 import { nanoid } from 'nanoid';
 import { useImmer } from 'use-immer';
 import { UpdateInferenceStatusRequestContent } from 'ws-api-typescript-websocket-client';
 import { useOnStreamLLMResponse, useOnUpdateInferenceStatus } from 'ws-api-typescript-websocket-hooks';
-import { useFoundationModelInventory } from './llm-inventory';
-import { useFeatureFlag, FEATURE_FLAG_STREAMING } from '..//providers/FlagsProvider';
-import { useChatEngineConfig } from '../providers/ChatEngineConfig';
+// import { useFoundationModelInventory } from './llm-inventory';
+// import { useFeatureFlag, FEATURE_FLAG_STREAMING } from '..//providers/FlagsProvider';
 
 export function useUseStreaming() {
-  const [options] = useChatEngineConfig();
-  const inventory = useFoundationModelInventory();
-  const featureToggleOnStreaming = useFeatureFlag(FEATURE_FLAG_STREAMING);
+  // const [options] = useChatEngineConfig();
+  // const inventory = useFoundationModelInventory();
+  // const featureToggleOnStreaming = useFeatureFlag(FEATURE_FLAG_STREAMING);
 
-  const isBedrockFramework =
-    options.llm?.model?.uuid &&
-    inventory?.models &&
-    inventory.models[options.llm.model.uuid]?.framework.type === ModelFramework.BEDROCK;
+  // const isBedrockFramework =
+  //   options.llm?.model?.uuid &&
+  //   inventory?.models
+  //   && inventory.models[options.llm.model.uuid]?.framework.type === ModelFramework.BEDROCK;
 
-  const isStreamingResponse =
-    featureToggleOnStreaming &&
-    isBedrockFramework &&
-    (typeof options.llm?.useStreaming === 'undefined' || options.llm?.useStreaming);
+  // const isStreamingResponse =
+  //   featureToggleOnStreaming &&
+  //   isBedrockFramework &&
+  //   (typeof options.llm?.useStreaming === 'undefined' || options.llm?.useStreaming);
 
-  return isStreamingResponse;
+  return false;
 }
 
 export interface InprogressMessages {

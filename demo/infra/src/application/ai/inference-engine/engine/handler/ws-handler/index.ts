@@ -92,6 +92,8 @@ export const sendChatMessage: SendChatMessageChainedHandlerFunction = async (req
     useStreaming: true,
   });
 
+  //TO-DO(JW): Error Handling for streaming
+
   await sdk.updateInferenceStatus(connectionId, {
     chatId,
     messageId: tmpMessageId,

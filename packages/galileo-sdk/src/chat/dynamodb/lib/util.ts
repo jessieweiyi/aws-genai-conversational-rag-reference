@@ -6,70 +6,12 @@ import {
   BatchWriteCommandOutput,
   DynamoDBDocumentClient,
   QueryCommandInput,
-  QueryCommandOutput,
-  UpdateCommandOutput,
+  ScanCommandInput,
   paginateQuery,
+  paginateScan,
 } from '@aws-sdk/lib-dynamodb';
 
-type DDBBaseEntity = Keys & {
-  createdAt: number;
-  entity: string;
-};
-
-type UserOwnedBaseEntity = DDBBaseEntity & {
-  userId: string;
-};
-
-export type DDBChat = UserOwnedBaseEntity &
-  GSI1Keys & {
-    chatId: string;
-    title: string;
-    createdAt: number;
-    entity: 'CHAT';
-  };
-
-export type DDBChatMessage = UserOwnedBaseEntity &
-  GSI1Keys & {
-    messageId: string;
-    chatId: string;
-    createdAt: number;
-    entity: 'MESSAGE';
-    data: {
-      content: string;
-    };
-    type: 'ai' | 'human';
-  };
-
-export type DDBMessageSource = UserOwnedBaseEntity & {
-  sourceId: string;
-  chatId: string;
-  messageId: string;
-  createdAt: number;
-  entity: 'SOURCE';
-  pageContent: string;
-  metadata: Record<string, any>;
-};
-
-export type DDBQueryOutput<EntityType, KeyType> = Omit<QueryCommandOutput, 'Items' | 'LastEvaluatedKey'> & {
-  Items?: EntityType[] | undefined;
-  LastEvaluatedKey?: KeyType | undefined;
-};
-
-export type DDBUpdateOutput<EntityType> = Omit<UpdateCommandOutput, 'Attributes'> & {
-  Attributes?: EntityType | undefined;
-};
-
-export type Keys = {
-  PK: string;
-  SK: string;
-};
-
-export type GSI1Keys = {
-  GSI1PK: string;
-  GSI1SK?: string | number;
-};
-
-export type AllKeys = Keys & GSI1Keys;
+import { AllKeys, Keys, GSI1Keys } from './types.js';
 
 export function generateNextToken(params: AllKeys): string {
   return `${params.PK}|${params.SK}|${params.GSI1PK}|${params.GSI1SK}`;
@@ -155,7 +97,11 @@ export async function bulkDelete(ddbClient: DynamoDBDocumentClient, tableName: s
   }
 }
 
-export async function getAllByPagination<Entity>(client: DynamoDBDocumentClient, commandInput: QueryCommandInput) {
+export async function getAllByPagination<Entity>(
+  client: DynamoDBDocumentClient,
+  commandInput: QueryCommandInput | ScanCommandInput,
+  commandType: 'Query' | 'Scan' = 'Query',
+) {
   let entities: Entity[] = [];
 
   const paginationConfig = {
@@ -163,7 +109,9 @@ export async function getAllByPagination<Entity>(client: DynamoDBDocumentClient,
     pageSize: 100,
   };
 
-  const paginator = paginateQuery(paginationConfig, commandInput);
+  const paginate = commandType === 'Query' ? paginateQuery : paginateScan;
+
+  const paginator = paginate(paginationConfig, commandInput);
 
   for await (const page of paginator) {
     if (page.Items !== undefined && Array.isArray(page.Items) && page.Items.length > 0) {

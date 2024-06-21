@@ -170,11 +170,6 @@
       "import": "./lib/chat/chain.js",
       "require": "./lib/chat/chain.cjs"
     },
-    "./lib/chat/config": {
-      "types": "./lib/chat/config/index.d.ts",
-      "import": "./lib/chat/config/index.js",
-      "require": "./lib/chat/config/index.cjs"
-    },
     "./lib/chat/context": {
       "types": "./lib/chat/context.d.ts",
       "import": "./lib/chat/context.js",
@@ -205,10 +200,25 @@
       "import": "./lib/chat/dynamodb/lib/sources.js",
       "require": "./lib/chat/dynamodb/lib/sources.cjs"
     },
+    "./lib/chat/dynamodb/lib/types": {
+      "types": "./lib/chat/dynamodb/lib/types.d.ts",
+      "import": "./lib/chat/dynamodb/lib/types.js",
+      "require": "./lib/chat/dynamodb/lib/types.cjs"
+    },
     "./lib/chat/dynamodb/lib/util": {
       "types": "./lib/chat/dynamodb/lib/util.d.ts",
       "import": "./lib/chat/dynamodb/lib/util.js",
       "require": "./lib/chat/dynamodb/lib/util.cjs"
+    },
+    "./lib/chat/dynamodb/lib/workflow": {
+      "types": "./lib/chat/dynamodb/lib/workflow.d.ts",
+      "import": "./lib/chat/dynamodb/lib/workflow.js",
+      "require": "./lib/chat/dynamodb/lib/workflow.cjs"
+    },
+    "./lib/chat/dynamodb/lib/workspace": {
+      "types": "./lib/chat/dynamodb/lib/workspace.d.ts",
+      "import": "./lib/chat/dynamodb/lib/workspace.js",
+      "require": "./lib/chat/dynamodb/lib/workspace.cjs"
     },
     "./lib/chat/dynamodb/message-history": {
       "types": "./lib/chat/dynamodb/message-history.d.ts",
@@ -229,6 +239,21 @@
       "types": "./lib/chat/search.d.ts",
       "import": "./lib/chat/search.js",
       "require": "./lib/chat/search.cjs"
+    },
+    "./lib/chat/stuff-documents-metadata-chain": {
+      "types": "./lib/chat/stuff-documents-metadata-chain.d.ts",
+      "import": "./lib/chat/stuff-documents-metadata-chain.js",
+      "require": "./lib/chat/stuff-documents-metadata-chain.cjs"
+    },
+    "./lib/chat/workflow/helper": {
+      "types": "./lib/chat/workflow/helper.d.ts",
+      "import": "./lib/chat/workflow/helper.js",
+      "require": "./lib/chat/workflow/helper.cjs"
+    },
+    "./lib/chat/workflow/types": {
+      "types": "./lib/chat/workflow/types.d.ts",
+      "import": "./lib/chat/workflow/types.js",
+      "require": "./lib/chat/workflow/types.cjs"
     },
     "./lib/common": {
       "types": "./lib/common/index.d.ts",
@@ -330,6 +355,11 @@
       "import": "./lib/models/llms/meta/index.js",
       "require": "./lib/models/llms/meta/index.cjs"
     },
+    "./lib/models/llms/meta/codellama": {
+      "types": "./lib/models/llms/meta/codellama.d.ts",
+      "import": "./lib/models/llms/meta/codellama.js",
+      "require": "./lib/models/llms/meta/codellama.cjs"
+    },
     "./lib/models/llms/meta/llama2": {
       "types": "./lib/models/llms/meta/llama2.d.ts",
       "import": "./lib/models/llms/meta/llama2.js",
@@ -380,40 +410,25 @@
       "import": "./lib/prompt/templates/chat/base.js",
       "require": "./lib/prompt/templates/chat/base.cjs"
     },
-    "./lib/prompt/templates/chat/classify": {
-      "types": "./lib/prompt/templates/chat/classify.d.ts",
-      "import": "./lib/prompt/templates/chat/classify.js",
-      "require": "./lib/prompt/templates/chat/classify.cjs"
+    "./lib/prompt/templates/chat/chat-router": {
+      "types": "./lib/prompt/templates/chat/chat-router.d.ts",
+      "import": "./lib/prompt/templates/chat/chat-router.js",
+      "require": "./lib/prompt/templates/chat/chat-router.cjs"
     },
     "./lib/prompt/templates/chat/condense-question": {
       "types": "./lib/prompt/templates/chat/condense-question.d.ts",
       "import": "./lib/prompt/templates/chat/condense-question.js",
       "require": "./lib/prompt/templates/chat/condense-question.cjs"
     },
+    "./lib/prompt/templates/chat/default-prompt-templates": {
+      "types": "./lib/prompt/templates/chat/default-prompt-templates.d.ts",
+      "import": "./lib/prompt/templates/chat/default-prompt-templates.js",
+      "require": "./lib/prompt/templates/chat/default-prompt-templates.cjs"
+    },
     "./lib/prompt/templates/chat/question-answer": {
       "types": "./lib/prompt/templates/chat/question-answer.d.ts",
       "import": "./lib/prompt/templates/chat/question-answer.js",
       "require": "./lib/prompt/templates/chat/question-answer.cjs"
-    },
-    "./lib/prompt/templates/store/registry": {
-      "types": "./lib/prompt/templates/store/registry.d.ts",
-      "import": "./lib/prompt/templates/store/registry.js",
-      "require": "./lib/prompt/templates/store/registry.cjs"
-    },
-    "./lib/prompt/templates/store/resolver": {
-      "types": "./lib/prompt/templates/store/resolver.d.ts",
-      "import": "./lib/prompt/templates/store/resolver.js",
-      "require": "./lib/prompt/templates/store/resolver.cjs"
-    },
-    "./lib/prompt/templates/store/system": {
-      "types": "./lib/prompt/templates/store/system.d.ts",
-      "import": "./lib/prompt/templates/store/system.js",
-      "require": "./lib/prompt/templates/store/system.cjs"
-    },
-    "./lib/prompt/types": {
-      "types": "./lib/prompt/types.d.ts",
-      "import": "./lib/prompt/types.js",
-      "require": "./lib/prompt/types.cjs"
     },
     "./lib/schema": {
       "types": "./lib/schema/index.d.ts",

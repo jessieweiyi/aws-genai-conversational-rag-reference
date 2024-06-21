@@ -1,7 +1,8 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
 import { DynamoDBDocumentClient, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
-import { getMessageSourceKey, DDBMessageSource, getAllByPagination } from './util.js';
+import { DDBMessageSource } from './types.js';
+import { getMessageSourceKey, getAllByPagination } from './util.js';
 
 export async function listChatMessageSources(
   documentClient: DynamoDBDocumentClient,

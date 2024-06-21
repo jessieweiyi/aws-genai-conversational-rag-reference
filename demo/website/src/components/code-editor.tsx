@@ -22,6 +22,7 @@ export interface CodeEditorProps extends Omit<BaseCodeEditorProps, 'ace' | 'onPr
   placeholder?: string;
   /** Custom autocomplete completions. @memoize */
   readonly completions?: Ace.Completion[];
+  readonly?: boolean;
 }
 
 const DEFAULT_RESOURCE_STRINGS = {

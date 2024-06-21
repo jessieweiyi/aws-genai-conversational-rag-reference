@@ -29,6 +29,10 @@
       "type": "build"
     },
     {
+      "name": "@smithy/util-waiter",
+      "type": "build"
+    },
+    {
       "name": "@types/fs-extra",
       "type": "build"
     },
@@ -243,6 +247,10 @@
     {
       "name": "@aws-cdk/aws-sagemaker-alpha",
       "version": "^2.137.0-alpha.0",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws/galileo-sdk",
       "type": "runtime"
     },
     {

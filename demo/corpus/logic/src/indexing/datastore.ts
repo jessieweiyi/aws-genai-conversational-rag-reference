@@ -49,6 +49,7 @@ export interface IndexingCacheProps {
 export class IndexingCache {
   readonly bucketName: string;
   readonly tableName: string;
+  readonly prefix?: string;
   readonly model: string;
   readonly baseLocalPath: string;
 

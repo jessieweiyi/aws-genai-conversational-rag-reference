@@ -10,6 +10,8 @@ service MyApi  with [
     ChatService
     CorpusService
     LLMService
+    WorkspacesService
+    WorkflowsService
 ]{
     version: "1.0"
     operations: []

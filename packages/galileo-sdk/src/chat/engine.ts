@@ -1,37 +1,40 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
 import '../langchain/patch.js';
-import { BaseRetriever } from '@langchain/core/retrievers';
-import { BaseLanguageModel } from 'langchain/base_language';
 import { ChatEngineCallbacks } from './callback.js';
-import { ChatEngineChain, ChatEngineChainFromInput } from './chain.js';
-import { ChatEngineConfig, resolveChatEngineConfig } from './config/index.js';
+import { ChatEngineChain } from './chain.js';
 import { DynamoDBChatMessageHistory } from './dynamodb/message-history.js';
 import { ChatEngineHistory, ChatTurn } from './memory.js';
-import { SearchRetriever, SearchRetrieverInput } from './search.js';
+import { SearchRetrieverInput } from './search.js';
+import { ChatEngineWorkflowHelper } from './workflow/helper.js';
+import { WorkflowConfiguration, ChatEngineWorkflow } from './workflow/types.js';
 import { startPerfMetric as $$$ } from '../common/metrics/index.js';
 import { Dict } from '../models/index.js';
 
-export interface ChatEngineFromOption extends Omit<ChatEngineConfig, 'search'> {
+export interface ChatEngineFromOption {
   readonly chatId: string;
   readonly userId: string;
+  readonly maxNewTokens?: number;
   readonly chatHistoryTable: string;
   readonly chatHistoryTableIndexName: string;
   readonly search: SearchRetrieverInput;
   readonly verbose?: boolean;
   readonly returnTraceData?: boolean;
   readonly engineCallbacks?: ChatEngineCallbacks;
+  readonly workflow: WorkflowConfiguration;
   readonly useStreaming?: boolean;
 }
 
-interface ChatEngineProps extends ChatEngineChainFromInput {
+interface ChatEngineProps {
   readonly chatId: string;
   readonly userId: string;
-  readonly llm: BaseLanguageModel;
+  readonly workflow: ChatEngineWorkflow;
+  readonly chatHistory: DynamoDBChatMessageHistory;
   readonly memory: ChatEngineHistory;
-  readonly retriever: BaseRetriever;
   readonly verbose?: boolean;
   readonly returnTraceData?: boolean;
+  readonly engineCallbacks?: ChatEngineCallbacks;
+  readonly useStreaming?: boolean;
 }
 
 export class ChatEngine {
@@ -39,23 +42,30 @@ export class ChatEngine {
     const {
       chatId,
       userId,
+      workflow: workflowDefinition,
+      maxNewTokens = 500,
       chatHistoryTable,
       chatHistoryTableIndexName,
+      search: searchOptions,
       verbose = process.env.LOG_LEVEL === 'DEBUG',
-      returnTraceData,
-      search,
-      engineCallbacks,
-      useStreaming,
-      ...unresolvedConfig
     } = options;
 
-    const config = await resolveChatEngineConfig(unresolvedConfig, {
-      verbose,
-    });
+    const workflow: ChatEngineWorkflow = {
+      steps: await Promise.all(
+        workflowDefinition.steps.map((step) =>
+          ChatEngineWorkflowHelper.buildFromStep({
+            step,
+            searchOptions,
+            maxNewTokens,
+            verbose,
+          }),
+        ),
+      ),
+    };
 
-    const retriever = new SearchRetriever(search);
-
-    const historyLimit = config.memory?.limit ?? 20;
+    //TO-DO(JW) config
+    //const historyLimit = config.memory?.limit ?? 20;
+    const historyLimit = 20;
     const chatHistory = new DynamoDBChatMessageHistory({
       tableName: chatHistoryTable,
       indexName: chatHistoryTableIndexName,
@@ -70,67 +80,45 @@ export class ChatEngine {
     });
 
     return new ChatEngine({
-      ...config,
-      chatId,
-      userId,
-      qaChain: {
-        type: 'stuff',
-        ...config.qaChain,
-      },
+      ...options,
+      chatHistory,
       memory,
-      retriever,
-      verbose,
-      returnTraceData,
-      engineCallbacks,
-      useStreaming,
+      workflow,
     });
   }
 
   readonly chatId: string;
   readonly userId: string;
-  readonly llm: BaseLanguageModel;
+  readonly chatHistory: DynamoDBChatMessageHistory;
   readonly memory: ChatEngineHistory;
-  readonly retriever: BaseRetriever;
+
   readonly chain: ChatEngineChain;
+  readonly workflow: ChatEngineWorkflow;
+
   readonly engineCallbacks?: ChatEngineCallbacks;
   readonly useStreaming: boolean;
 
   protected readonly returnTraceData: boolean;
 
   constructor(props: ChatEngineProps) {
-    const {
-      chatId,
-      userId,
-      llm,
-      memory,
-      retriever,
-      qaChain,
-      condenseQuestionChain,
-      classifyChain,
-      verbose,
-      returnTraceData,
-      engineCallbacks,
-      useStreaming,
-    } = props;
+    const { chatId, userId, chatHistory, memory, verbose, returnTraceData, engineCallbacks, useStreaming, workflow } =
+      props;
 
+    this.workflow = workflow;
     this.returnTraceData = returnTraceData ?? false;
 
     this.chatId = chatId;
     this.userId = userId;
-    this.llm = llm;
+
+    this.chatHistory = chatHistory;
     this.memory = memory;
-    this.retriever = retriever;
 
     this.engineCallbacks = engineCallbacks;
     this.useStreaming = useStreaming ?? false;
 
-    this.chain = ChatEngineChain.from({
+    this.chain = ChatEngineChain.fromWorkflow(this.workflow, {
       verbose,
       memory,
-      retriever,
-      qaChain,
-      condenseQuestionChain,
-      classifyChain,
       returnSourceDocuments: true,
       engineCallbacks,
       useStreaming: this.useStreaming,
@@ -143,7 +131,7 @@ export class ChatEngine {
 
   async query(query: string): Promise<ChatEngineQueryResponse> {
     const $time = $$$('Engine.Query.ExecutionTime', { highResolution: true });
-    const result = await this.chain.call({ question: query });
+    const result = await this.chain.invoke({ question: query });
     $time();
     const turn = this.memory.lastTurn;
 
@@ -161,7 +149,6 @@ export class ChatEngine {
         chatId: this.chatId,
         userId: this.userId,
         ...this.chain.traceData,
-        search: this.retriever.toJSON(),
       };
     } catch (error) {
       return {

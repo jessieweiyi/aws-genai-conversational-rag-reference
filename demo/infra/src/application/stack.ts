@@ -1,13 +1,11 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
-import { FoundationModelIds } from '@aws/galileo-cdk/lib/ai/predefined';
 import { ServiceQuotas, isDevStage } from '@aws/galileo-cdk/lib/common';
 import { IApplicationContext } from '@aws/galileo-cdk/lib/core/app';
 import { ApplicationConfig } from '@aws/galileo-cdk/lib/core/app/context/types';
 import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { FoundationModelStack } from './ai/foundation-models';
-import { InferenceEngineStack } from './ai/inference-engine';
 import { CorpusStack } from './corpus';
 import { AppDataLayer } from './data';
 import { IdentityLayer } from './identity';
@@ -80,6 +78,7 @@ export class Application extends Stack {
       embeddingInstanceType: config.rag.managedEmbeddings.instanceType,
       embeddingModels: config.rag.managedEmbeddings.embeddingsModels!,
       embeddingModelAutoScaling: config.rag.managedEmbeddings.autoscaling,
+      workspaceTable: appData.workspaceDataStore,
     });
     this.corpusEtlStateMachineArn = corpus.pipelineStateMachineArn;
     this.corpusProcessedBucketArn = corpus.processedDataBucket.bucketArn;

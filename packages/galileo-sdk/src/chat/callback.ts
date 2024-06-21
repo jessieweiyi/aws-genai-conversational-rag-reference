@@ -15,13 +15,6 @@ export interface ChatEngineCallbacks {
   readonly updateStatus: UpdateStatusCallback;
 }
 
-export enum ChainOperation {
-  CLASSIFY = 'CLASSIFY',
-  CONDENSE_QUESTION = 'CONDENSE_QUESTION',
-  DOCUMENT_RETRIEVE = 'DOCUMENT_RETRIEVE',
-  QA = 'QA',
-}
-
 export interface ChainOperationPayload {
   readonly message: string;
   readonly executionTime?: number;

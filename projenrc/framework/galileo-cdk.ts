@@ -39,6 +39,7 @@ export class GalileoCdk extends AwsCdkConstructLibrary {
         '@aws-sdk/types',
         '@pnpm/logger',
         '@types/fs-extra',
+        '@smithy/util-waiter',
       ],
       bundledDeps: [
         '@aws-lambda-powertools/logger',

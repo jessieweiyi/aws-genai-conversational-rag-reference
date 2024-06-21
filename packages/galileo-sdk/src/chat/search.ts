@@ -11,13 +11,18 @@ import { getLogger } from '../common/index.js';
 
 const logger = getLogger('chat/search');
 
-export interface SearchRetrieverInput extends Omit<RemoteLangChainRetrieverParams, 'auth'> {
+export interface SearchRetrieverInput extends Omit<RemoteLangChainRetrieverParams, 'auth' | 'url'> {
   readonly limit?: number;
   readonly filter?: Record<string, unknown>;
   readonly fetch?: typeof fetch;
   // TODO: implement score threshold
   readonly scoreThreshold?: number;
+  readonly baseUrl: string;
   readonly modelRefKey?: string;
+}
+
+export interface SearchRetrieverProps extends SearchRetrieverInput {
+  readonly workspaceId: string;
 }
 
 export class SearchRetriever extends RemoteLangChainRetriever {
@@ -27,12 +32,13 @@ export class SearchRetriever extends RemoteLangChainRetriever {
   readonly scoreThreshold?: number;
   readonly modelRefKey?: string;
 
-  constructor(input: SearchRetrieverInput) {
+  constructor(input: SearchRetrieverProps) {
     super({
       inputKey: 'query',
       responseKey: 'documents',
       pageContentKey: 'pageContent',
       auth: false,
+      url: input.baseUrl + `workspace/${input.workspaceId}/search`,
       ...input,
     });
 

@@ -1,13 +1,56 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
-import '../langchain/patch.js';
-import { PromptTemplate } from '@langchain/core/prompts';
-import { InputValues, PartialValues } from '@langchain/core/utils/types';
 import { comparison as comparisonHelpers, string as stringHelpers, math as mathHelpers } from 'handlebars-helpers-lite';
+import '../langchain/patch.js';
+import { PromptTemplate, PromptTemplateInput } from 'langchain/prompts';
+import { InputValues, PartialValues } from 'langchain/schema';
 import { merge } from 'lodash';
 import { Handlebars } from 'safe-handlebars/dist/handlebars.js';
 import { allowUnsafeEval } from 'safe-handlebars/dist/utils.js';
-import { HandlebarsTemplatePartials, HandlebarsPromptTemplateInput, Inverse } from './types.js';
+
+// Extract the keys of required properties
+type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
+}[keyof T];
+
+// Extract the keys of optional properties
+type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
+}[keyof T];
+
+type Inverse<T> = Partial<Pick<T, RequiredKeys<T>>> & Required<Pick<T, OptionalKeys<T>>>;
+
+export type HandlebarsTemplatePartials = { [K: string]: Handlebars.Template<any> | undefined };
+
+export interface HandlebarsPromptTemplateInput<
+  TemplatePartials extends HandlebarsTemplatePartials,
+  InputVariables extends InputValues,
+  PartialVariables extends object = Inverse<InputVariables>,
+> extends Omit<PromptTemplateInput<InputVariables, any>, 'partialVariables'> {
+  readonly handlebars?: typeof Handlebars;
+  readonly compileOptions?: CompileOptions;
+  readonly runtimeOptions?: RuntimeOptions;
+  readonly templatePartials?: TemplatePartials;
+  readonly partialVariables?: PartialVariables;
+}
+
+export interface ScopedHandlebarsPromptTemplateInput<
+  TemplatePartials extends HandlebarsTemplatePartials,
+  InputVariables extends InputValues,
+  PartialVariables extends object = Inverse<InputVariables>,
+> extends Partial<
+    Omit<
+      HandlebarsPromptTemplateInput<TemplatePartials, InputVariables>,
+      'inputVariables' | 'templatePartials' | 'partialVariables'
+    >
+  > {
+  readonly templatePartials?: Partial<TemplatePartials>;
+  readonly partialVariables?: Partial<PartialVariables>;
+}
+
+export type HandlebarsPromptTemplateRuntime<T extends { [K: string]: any }> = Partial<
+  Pick<T, 'template' | 'templatePartials' | 'partialVariables'>
+>;
 
 export class HandlebarsPromptTemplate<
     TemplatePartials extends HandlebarsTemplatePartials,
@@ -135,7 +178,6 @@ export class HandlebarsPromptTemplate<
         template = template.replace(searchValue, replacement);
       }
     }
-
     return template;
   }
 }

@@ -5,7 +5,6 @@ import Header from '@cloudscape-design/components/header';
 import { Chat } from 'api-typescript-react-query-hooks';
 import { useCallback, useRef } from 'react';
 import DeleteChatButton from './components/DeleteChatButton';
-import ExportChat from './components/ExportChat';
 import HumanInputForm from './components/HumanInputForm';
 import { ConversationView } from './ConversationView';
 import { useInprogressMessages } from '../../hooks';
@@ -26,6 +25,7 @@ export default function ChatPanel(props: SessionChatProps) {
   const conversationRef = useRef<HTMLDivElement>(null);
   const updateChat = useUpdateChatMutation();
   const inprogressMessages = useInprogressMessages(props.chat.chatId);
+  const readonly = !props.chat.workflowId; // If the chat is not linked to a workflow/workspace, render it as readonly for backward compatability
 
   const lastInprogressMessage = inprogressMessages?.statusUpdates[inprogressMessages?.statusUpdates.length - 1];
 
@@ -59,7 +59,6 @@ export default function ChatPanel(props: SessionChatProps) {
         variant="h3"
         actions={
           <SpaceBetween size="xxxs" direction="horizontal">
-            <ExportChat chat={props.chat} />
             <DeleteChatButton chat={props.chat} />
           </SpaceBetween>
         }
@@ -89,7 +88,7 @@ export default function ChatPanel(props: SessionChatProps) {
           flex: 0,
         }}
       >
-        <HumanInputForm chat={props.chat} onSuccess={onMessageSuccess} />
+        {!readonly && <HumanInputForm chat={props.chat} onSuccess={onMessageSuccess} />}
         <SpaceBetween direction="horizontal" size="m">
           {
             inprogressMessages != null && lastInprogressMessage && (
