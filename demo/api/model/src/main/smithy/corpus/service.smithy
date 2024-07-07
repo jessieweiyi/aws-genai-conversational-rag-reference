@@ -85,8 +85,9 @@ operation SimilaritySearch {
       filter: Any
       // Distance strategy to use for similar search
       distanceStrategy: DistanceStrategy
-      // Embedding model reference key
-      modelRefKey: String
+      @required
+      // Embedding model reference key 
+      workspaceId: String
     }
     output:= {
       @required

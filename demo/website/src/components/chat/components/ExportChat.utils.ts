@@ -2,7 +2,7 @@
 PDX-License-Identifier: Apache-2.0 */
 
 import { SegmentedControlProps } from '@cloudscape-design/components';
-import { Chat, ChatEngineConfig, ChatMessage } from 'api-typescript-react-query-hooks';
+import { Chat, ChatMessage } from 'api-typescript-react-query-hooks';
 import { omit } from 'lodash';
 import dayjs from '../../../types/dayjs';
 
@@ -46,7 +46,8 @@ export interface ChatExport {
 export interface ChatExportHelperOptions {
   readonly chat: Chat;
   readonly messages: ChatMessage[];
-  readonly chatEngineConfig: ChatEngineConfig;
+  readonly modelId: string;
+  readonly modelKwargs?: any;
   readonly includeModelKwargs?: boolean;
   readonly includeLLMInfo?: boolean;
 }
@@ -66,11 +67,8 @@ export class ChatExportHelper {
         title: chat.title,
         createdAt: chat.createdAt == null ? undefined : dayjs(chat.createdAt).format(DATETIMEFORMAT),
       },
-      llmInfo: options.includeLLMInfo ? options.chatEngineConfig.llm?.model?.uuid : undefined,
-      modelKwargs:
-        options.includeModelKwargs && options.chatEngineConfig.llm?.modelKwargs
-          ? omit(options.chatEngineConfig.llm.modelKwargs, 'stop_sequences')
-          : undefined,
+      llmInfo: options.modelId,
+      modelKwargs: options.modelKwargs ? omit(options.modelKwargs, 'stop_sequences') : undefined,
       messages: messages.map((msg) => ({
         messageId: msg.messageId,
         text: msg.text,

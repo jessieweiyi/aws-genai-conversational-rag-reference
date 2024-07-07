@@ -132,6 +132,7 @@ export class CorpusStack extends MonitoredNestedStack {
         USER_POOL_CLIENT_ID: props.userPoolClientId,
         USER_POOL_ID: props.userPoolId,
         TRANSFORMER_CACHE: '/tmp/.cache',
+        TABLE_NAME_WORKSPACES: props.workspaceTable.tableName,
       },
       initialPolicy: [
         new iam.PolicyStatement({
@@ -144,6 +145,8 @@ export class CorpusStack extends MonitoredNestedStack {
     });
     embeddingsModel.grantInvoke(this.apiLambda);
     this.vectorStore.grantConnect(this.apiLambda);
+    props.workspaceTable.grantReadData(this.apiLambda);
+
     NagSuppressions.addResourceSuppressions(
       this.apiLambda,
       [

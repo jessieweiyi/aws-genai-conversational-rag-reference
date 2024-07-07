@@ -1,8 +1,11 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
+import { getWorkspace } from '@aws/galileo-sdk/lib/chat/dynamodb/lib/workspace';
 import { PGVectorStoreOptions, distanceStrategyFromValue } from '@aws/galileo-sdk/lib/vectorstores';
 
-import { getPostgresTableName } from '@aws/galileo-sdk/lib/vectorstores/pgvector/utils';
+import { getPostgresTableNameByWorkspace } from '@aws/galileo-sdk/lib/vectorstores/pgvector/utils';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { corsInterceptor } from 'api-typescript-interceptors';
 import {
   Document,
@@ -13,13 +16,23 @@ import {
   similaritySearchHandler,
 } from 'api-typescript-runtime';
 import { findEmbeddingModelByRefKey, getEmbeddingsByModelId } from '../embedding/util';
+
 import { ENV } from '../env';
 import { vectorStoreFactory } from '../vectorstore';
 
 const interceptors = [corsInterceptor] as const;
 
+const TABLE_NAME_WORKSPACES = process.env.TABLE_NAME_WORKSPACES!;
+
+const dynamodb = new DynamoDBClient({});
+const documentClient = DynamoDBDocumentClient.from(dynamodb, {
+  marshallOptions: {
+    removeUndefinedValues: true,
+  },
+});
+
 export const similaritySearch = similaritySearchHandler(...interceptors, async ({ input }) => {
-  const { query, k, filter, distanceStrategy, modelRefKey } = input.body;
+  const { query, k, filter, distanceStrategy, workspaceId } = input.body;
 
   // NB: changing distanceStrategy should only be used for development since
   // unless the strategy is also indexes as performance will be slower.
@@ -30,13 +43,20 @@ export const similaritySearch = similaritySearchHandler(...interceptors, async (
     };
   }
 
-  const embeddingModel = findEmbeddingModelByRefKey(modelRefKey);
+  const workspace = await getWorkspace(documentClient, TABLE_NAME_WORKSPACES, workspaceId);
+
+  if (!workspace) {
+    throw new Error(`Unable to locate workspace ${workspaceId}`);
+  }
+
+  const embeddingModel = workspace.data?.indexing?.embeddingModel;
+
   if (!embeddingModel) {
-    throw new Error(`InvalidPayload: no embedding model found for ref key ${modelRefKey}.`);
+    throw new Error(`Unable to find embeddingModel info for ${workspaceId}`);
   }
 
   const vectorStore = await vectorStoreFactory({
-    embeddingTableName: getPostgresTableName(embeddingModel),
+    embeddingTableName: getPostgresTableNameByWorkspace(workspaceId),
     vectorSize: embeddingModel.dimensions,
     embeddings: getEmbeddingsByModelId(embeddingModel.modelId, {}),
     config: vectorStoreConfig,

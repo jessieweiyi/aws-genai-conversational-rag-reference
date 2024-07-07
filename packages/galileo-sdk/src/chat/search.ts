@@ -30,7 +30,7 @@ export class SearchRetriever extends RemoteLangChainRetriever {
   readonly filter?: Record<string, unknown>;
   readonly fetch: typeof fetch;
   readonly scoreThreshold?: number;
-  readonly modelRefKey?: string;
+  readonly workspaceId?: string;
 
   constructor(input: SearchRetrieverProps) {
     super({
@@ -38,7 +38,7 @@ export class SearchRetriever extends RemoteLangChainRetriever {
       responseKey: 'documents',
       pageContentKey: 'pageContent',
       auth: false,
-      url: input.baseUrl + `workspace/${input.workspaceId}/search`,
+      url: input.baseUrl,
       ...input,
     });
 
@@ -46,7 +46,7 @@ export class SearchRetriever extends RemoteLangChainRetriever {
     this.filter = input.filter;
     this.fetch = input.fetch ?? fetch;
     this.scoreThreshold = input.scoreThreshold;
-    this.modelRefKey = input.modelRefKey;
+    this.workspaceId = input.workspaceId;
   }
 
   createJsonBody(query: string): RemoteRetrieverValues {
@@ -58,8 +58,8 @@ export class SearchRetriever extends RemoteLangChainRetriever {
       values.filter = this.filter;
     }
 
-    if (this.modelRefKey) {
-      values.modelRefKey = this.modelRefKey;
+    if (this) {
+      values.workspaceId = this.workspaceId;
     }
     return values;
   }

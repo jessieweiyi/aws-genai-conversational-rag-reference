@@ -103,7 +103,7 @@ export class ChatEngineChain extends BaseChain implements ChatEngineChainInput {
             chat_history: stepResult.chat_history ?? [],
           };
 
-          console.log('input', input);
+          console.log('input', input, step.context); //JW: { question: 'Hello', chat_history: [] }
 
           // this.updateStatusCallback({
           //   operation: step.type,

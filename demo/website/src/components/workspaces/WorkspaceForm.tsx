@@ -73,7 +73,7 @@ const WorkspaceForm: FC<WorkspaceFormProps> = ({ workspace, onSubmit }) => {
         type: workspaceType,
         chatModel: chatModel!,
         prompt: {
-          promptTemplate: DEFAULT_PROMPTS[workspaceType],
+          promptTemplate,
         },
         data:
           workspaceType === 'DATA'

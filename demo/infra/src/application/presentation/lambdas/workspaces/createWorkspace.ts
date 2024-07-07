@@ -4,7 +4,7 @@ import { createWorkspace } from '@aws/galileo-sdk/lib/chat/dynamodb/lib/workspac
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { interceptors } from 'api-typescript-interceptors';
-import { createWorkspaceHandler, CreateWorkspaceResponseContent, WorkspaceDefinition } from 'api-typescript-runtime';
+import { createWorkspaceHandler, CreateWorkspaceResponseContent } from 'api-typescript-runtime';
 
 const dynamodb = new DynamoDBClient({});
 const documentClient = DynamoDBDocumentClient.from(dynamodb, {
@@ -20,17 +20,13 @@ export const handler = createWorkspaceHandler(...interceptors, async ({ input, i
   const userId = interceptorContext.callingIdentity?.identityId;
   if (!userId) throw new Error('no userId was found in context');
 
-  const { name, description, type, chatModel, data, routerDefinition } = input.body;
+  const { name, ...data } = input.body;
 
   if (!name || name.length === 0) throw new Error('name is invalid');
 
   const { workspace } = await createWorkspace(documentClient, tableName, userId, {
     name,
-    description,
-    type,
-    data,
-    routerDefinition,
-    chatModel,
+    ...data,
   });
 
   const response: CreateWorkspaceResponseContent = {
