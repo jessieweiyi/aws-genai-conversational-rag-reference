@@ -81,7 +81,7 @@ class WorkflowBuilder {
       workflow,
       workspaces: (workspaces as Workspace[]).reduce((acc, w) => {
         return {
-          ...w,
+          ...acc,
           [w.workspaceId]: w,
         };
       }, {}),
@@ -102,6 +102,7 @@ class WorkflowBuilder {
       this.workspaceTableName,
       routeWorkspaces.map((x) => x.id),
     );
+
     if (ws.length !== routeWorkspaces.length) {
       throw new Error(`Not all workspaces routed by router workspace ${workspace.workspaceId} does not exist`);
     }
