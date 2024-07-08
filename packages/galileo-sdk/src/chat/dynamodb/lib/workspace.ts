@@ -86,25 +86,39 @@ export async function updateWorkspace(
   documentClient: DynamoDBDocumentClient,
   tableName: string,
   workspaceId: string,
-  data: Pick<DDBWorkspace, 'name' | 'description' | 'prompt' | 'chatModel' | 'routerDefinition'>,
+  data: Pick<DDBWorkspace, 'type' | 'name' | 'description' | 'prompt' | 'chatModel' | 'routerDefinition'>,
 ) {
+  let updateExpression =
+    'set #workspaceName = :workspaceName, description = :description, prompt = :prompt, chatModel = :chatModel';
+
+  let expressionAttributeValues: any = {
+    ':workspaceName': data.name,
+    ':description': data.description || '',
+    ':prompt': data.prompt || {},
+    ':chatModel': data.chatModel || {},
+    ':workspaceType': data.type,
+  };
+
+  if (data.type === 'ROUTER') {
+    updateExpression = `${updateExpression}, routerDefinition = :routerDefinition`;
+
+    expressionAttributeValues = {
+      ...expressionAttributeValues,
+      ':routerDefinition': data.routerDefinition || {},
+    };
+  } // DATA (embeddingModel) should not be changed
+
   const command = new UpdateCommand({
     TableName: tableName,
     Key: {
       workspaceId,
     },
-    ConditionExpression: 'attribute_exists(workspaceId)',
-    UpdateExpression:
-      'set #workspaceName = :workspaceName, description = :description, prompt = :prompt, chatModel = :chatModel, routerDefinition = :routerDefinition',
-    ExpressionAttributeValues: {
-      ':workspaceName': data.name,
-      ':description': data.description || '',
-      ':prompt': data.prompt || {},
-      ':chatModel': data.chatModel || {},
-      ':routerDefinition': data.routerDefinition || {},
-    },
+    ConditionExpression: 'attribute_exists(workspaceId) AND #workspaceType = :workspaceType',
+    UpdateExpression: updateExpression,
+    ExpressionAttributeValues: expressionAttributeValues,
     ExpressionAttributeNames: {
       '#workspaceName': 'name',
+      '#workspaceType': 'type',
     },
     ReturnValues: 'ALL_NEW',
   });

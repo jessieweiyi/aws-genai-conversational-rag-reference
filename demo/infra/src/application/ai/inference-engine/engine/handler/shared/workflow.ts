@@ -1,7 +1,7 @@
 /*! Copyright [Amazon.com](http://amazon.com/), Inc. or its affiliates. All Rights Reserved.
 PDX-License-Identifier: Apache-2.0 */
 import { getWorkflow } from '@aws/galileo-sdk/lib/chat/dynamodb/lib/workflow';
-import { batchGetWorkspaces } from '@aws/galileo-sdk/lib/chat/dynamodb/lib/workspace';
+import { batchGetWorkspaces, getWorkspace } from '@aws/galileo-sdk/lib/chat/dynamodb/lib/workspace';
 import { WorkflowConfiguration, WorkflowStepType } from '@aws/galileo-sdk/lib/chat/workflow/types';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { Workflow, Workspace } from 'api-typescript-runtime';
@@ -88,15 +88,47 @@ class WorkflowBuilder {
     };
   }
 
+  async getRouterWorkspaceRoutes(workspace: Workspace): Promise<{
+    [id: string]: WorkflowStepType;
+  }> {
+    const routeWorkspaces = workspace.routerDefinition?.workspaces;
+
+    if (!routeWorkspaces || routeWorkspaces.length === 0) {
+      throw new Error(`workspaces routed by router workspace ${workspace.workspaceId} is empty`);
+    }
+
+    const ws = await batchGetWorkspaces(
+      this.documentClient,
+      this.workspaceTableName,
+      routeWorkspaces.map((x) => x.id),
+    );
+    if (ws.length !== routeWorkspaces.length) {
+      throw new Error(`Not all workspaces routed by router workspace ${workspace.workspaceId} does not exist`);
+    }
+
+    const workflowSteps = await Promise.all(ws.map(async (w) => this.convertWorkspaceToWorkflowStep(w)));
+
+    return Object.fromEntries(ws.map((w, index) => [w.workspaceId, workflowSteps[index]]));
+  }
+
   async convertWorkspaceToWorkflowStep(workspace: Workspace): Promise<WorkflowStepType> {
     const stepType = getStepType(workspace);
     return {
       workspaceId: workspace.workspaceId,
       llmModelId: workspace.chatModel.modelId,
       promptTemplate: workspace.prompt?.promptTemplate || '',
-      ...{
-        type: stepType,
-      },
+      ...(stepType === 'ROUTER'
+        ? {
+            type: stepType,
+            responseRouteKey: 'workspaceId',
+            routes: await this.getRouterWorkspaceRoutes(workspace),
+            additionalPromptSubstitutions: {
+              workspaces: workspace.routerDefinition?.workspaces || [],
+            },
+          }
+        : {
+            type: stepType,
+          }),
     } as WorkflowStepType;
   }
 

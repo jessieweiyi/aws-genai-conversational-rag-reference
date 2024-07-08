@@ -24,6 +24,9 @@ operation UpdateWorkspace {
       @httpLabel
       @required
       workspaceId: WorkspaceId
+
+      @required
+      type: WorkspaceType
     }
     output: Workspace
     errors: [NotFoundError]
